@@ -16,6 +16,9 @@ app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
+// Places ke routes (GET, POST, PUT /api/places)
+app.use("/api/places", require("./routes/places"));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
