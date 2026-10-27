@@ -1,6 +1,19 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  updatedJustNow: {
+    en: 'Updated just now',
+    hi: 'अभी अपडेट हुआ',
+    bn: 'এইমাত্র আপডেট হয়েছে',
+    ta: 'இப்போதுதான் புதுப்பிக்கப்பட்டது',
+  },
+  // {n} ki jagah minutes aate hain
+  updatedMinAgo: {
+    en: 'Updated {n} min ago',
+    hi: '{n} मिनट पहले अपडेट हुआ',
+    bn: '{n} মিনিট আগে আপডেট হয়েছে',
+    ta: '{n} நிமிடங்களுக்கு முன் புதுப்பிக்கப்பட்டது',
+  },
   tagline: {
     en: "Bringing India's forgotten heritage back to life",
     hi: 'भारत की भूली-बिसरी विरासत को फिर से जीवन देना',

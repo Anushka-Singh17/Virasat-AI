@@ -34,10 +34,11 @@ export function LanguageProvider({ children }) {
     }
   }, [lang])
 
-  // t('key') -> chuni hui language ka text; nahi mila to English
-  function t(key) {
+  // t('key', { n: 2 }) -> chuni hui language ka text, {n} ki jagah value; nahi mila to English
+  function t(key, vars = {}) {
     const entry = strings[key]
-    return entry?.[lang] ?? entry?.en ?? key
+    const text = entry?.[lang] ?? entry?.en ?? key
+    return text.replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? '')
   }
 
   return (

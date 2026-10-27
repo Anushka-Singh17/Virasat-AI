@@ -1,17 +1,21 @@
+import { useLanguage } from '../i18n/LanguageContext'
+
 const TYPE_CHIPS = [
-  { value: 'all', label: 'All' },
-  { value: 'baoli', label: 'Baoli' },
-  { value: 'kila', label: 'Fort' },
-  { value: 'mandir', label: 'Temple' },
+  { value: 'all', key: 'filterAll' },
+  { value: 'baoli', key: 'typeBaoli' },
+  { value: 'kila', key: 'typeFort' },
+  { value: 'mandir', key: 'typeTemple' },
 ]
 
 export default function SearchBar({ query, onQueryChange, typeFilter, onTypeChange, results, onResultClick }) {
+  const { t } = useLanguage()
+
   return (
     <div className="card search">
       <input
         className="input"
         type="search"
-        placeholder="Search by name, state or type..."
+        placeholder={t('searchPlaceholder')}
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
       />
@@ -23,14 +27,14 @@ export default function SearchBar({ query, onQueryChange, typeFilter, onTypeChan
             className={`chip ${typeFilter === chip.value ? 'active' : ''}`}
             onClick={() => onTypeChange(chip.value)}
           >
-            {chip.label}
+            {t(chip.key)}
           </button>
         ))}
       </div>
 
       {query.trim() && (
         <ul className="results">
-          {results.length === 0 && <li className="muted">No places found</li>}
+          {results.length === 0 && <li className="muted">{t('noPlacesFound')}</li>}
           {results.map((p) => (
             <li key={p._id}>
               <button className="result-item" onClick={() => onResultClick(p)}>

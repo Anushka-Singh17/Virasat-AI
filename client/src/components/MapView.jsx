@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { pinIcons } from '../leafletIcons'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const INDIA_CENTER = [22.5, 79]
 
@@ -24,6 +25,8 @@ function LocationPicker({ enabled, onPick }) {
 }
 
 export default function MapView({ places, onSelect, flyTarget, pickMode, onPick, location }) {
+  const { t } = useLanguage()
+
   return (
     <div className="map-wrap">
       <MapContainer center={INDIA_CENTER} zoom={5} className={`map ${pickMode ? 'picking' : ''}`}>
@@ -46,7 +49,7 @@ export default function MapView({ places, onSelect, flyTarget, pickMode, onPick,
         {location && <Marker position={[location.lat, location.lng]} />}
       </MapContainer>
 
-      {pickMode && <div className="pick-hint">Click on the map to choose a location</div>}
+      {pickMode && <div className="pick-hint">{t('pickHint')}</div>}
     </div>
   )
 }

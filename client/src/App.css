@@ -25,12 +25,28 @@
   opacity: 0.9;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .demo-pill {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.2);
   white-space: nowrap;
+}
+
+.lang-select {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  color: var(--brown);
+  cursor: pointer;
 }
 
 .stats {
@@ -58,6 +74,18 @@
 .stat span {
   font-size: 12px;
   color: var(--muted);
+}
+
+.stats-wrap {
+  background: var(--sand);
+}
+
+.stats-updated {
+  text-align: right;
+  font-size: 12px;
+  color: var(--brown);
+  opacity: 0.8;
+  padding: 0 20px 8px;
 }
 
 .text-green {

@@ -32,6 +32,12 @@ export async function getPlaces() {
   return data
 }
 
+// Real mode only: backend se counts lo ({ total, verified, unknown })
+export async function getStats() {
+  const { data } = await http.get('/api/stats')
+  return data
+}
+
 export async function updatePlace(id, body) {
   if (isMock) {
     await wait(500)

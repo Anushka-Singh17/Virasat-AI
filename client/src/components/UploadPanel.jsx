@@ -1,30 +1,31 @@
 import { useEffect, useState } from 'react'
 import exifr from 'exifr'
 import { analyzeImage } from '../api'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const SOURCE_BADGE = {
-  database: { text: 'Found in our archive', cls: 'badge-db' },
-  gemini: { text: 'Identified by AI', cls: 'badge-ai' },
-  unknown: { text: 'Unknown – help us!', cls: 'badge-unknown' },
+  database: { key: 'sourceDatabase', cls: 'badge-db' },
+  gemini: { key: 'sourceGemini', cls: 'badge-ai' },
+  unknown: { key: 'sourceUnknown', cls: 'badge-unknown' },
 }
 
 function ResultCard({ data }) {
+  const { t } = useLanguage()
   const badge = SOURCE_BADGE[data.source] ?? SOURCE_BADGE.unknown
   const p = data.place
   return (
     <div className="result">
-      <span className={`source-badge ${badge.cls}`}>{badge.text}</span>
+      <span className={`source-badge ${badge.cls}`}>{t(badge.key)}</span>
       <h4>{p.naam}</h4>
       {p.geminiInfo && <p>{p.geminiInfo}</p>}
       {p.translation && <p>{p.translation}</p>}
-      {data.source === 'unknown' && (
-        <p className="hint">Open this pin on the map and click "Add info".</p>
-      )}
+      {data.source === 'unknown' && <p className="hint">{t('openPinHint')}</p>}
     </div>
   )
 }
 
 export default function UploadPanel({ location, onLocationFound, pickMode, onTogglePick, onNewPlace }) {
+  const { t } = useLanguage()
   const [mode, setMode] = useState('place')
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState('')
@@ -47,25 +48,25 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
     setFile(chosen)
     setResult(null)
     setError('')
-    setGpsNote('Reading GPS from photo...')
+    setGpsNote(t('readingGps'))
 
     try {
       const gps = await exifr.gps(chosen)
       if (gps?.latitude && gps?.longitude) {
         onLocationFound({ lat: gps.latitude, lng: gps.longitude })
-        setGpsNote('GPS found in photo ✅')
+        setGpsNote(t('gpsFound'))
       } else {
-        setGpsNote('No GPS in this photo. Click on the map to choose a location.')
+        setGpsNote(t('noGps'))
       }
     } catch {
-      setGpsNote('Could not read GPS. Choose a location on the map.')
+      setGpsNote(t('gpsError'))
     }
   }
 
   async function handleSubmit() {
     if (!file) return
     if (mode === 'place' && !location) {
-      setError('A location is needed for place photos (GPS or map click)')
+      setError(t('needLocation'))
       return
     }
 
@@ -82,7 +83,7 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
       setResult(data)
       onNewPlace(data.place)
     } catch {
-      setError('AI could not check this. Make sure the backend is running.')
+      setError(t('aiError'))
     } finally {
       setLoading(false)
     }
@@ -90,29 +91,29 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
 
   return (
     <section className="card upload">
-      <h3>Upload a heritage photo or document</h3>
+      <h3>{t('uploadTitle')}</h3>
 
       <div className="tabs" role="tablist">
         <button
           className={`tab ${mode === 'place' ? 'active' : ''}`}
           onClick={() => setMode('place')}
         >
-          Place photo
+          {t('placePhoto')}
         </button>
         <button
           className={`tab ${mode === 'document' ? 'active' : ''}`}
           onClick={() => setMode('document')}
         >
-          Old document
+          {t('oldDocument')}
         </button>
       </div>
 
       <label className="dropzone">
         <input type="file" accept="image/*" onChange={handleFile} />
         {preview ? (
-          <img src={preview} alt="Preview" />
+          <img src={preview} alt={t('previewAlt')} />
         ) : (
-          <span>📷 Tap to choose a photo</span>
+          <span>📷 {t('choosePhoto')}</span>
         )}
       </label>
 
@@ -125,21 +126,21 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
               {location
                 ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
                 : mode === 'document'
-                  ? 'Location is optional'
-                  : 'No location yet'}
+                  ? t('locationOptional')
+                  : t('noLocation')}
             </span>
             <button className="btn ghost small" onClick={onTogglePick}>
-              {pickMode ? 'Cancel' : 'Pick on map'}
+              {pickMode ? t('cancel') : t('pickOnMap')}
             </button>
           </div>
         </>
       )}
 
       <button className="btn primary full" disabled={!file || loading} onClick={handleSubmit}>
-        {loading ? 'Please wait...' : 'Identify'}
+        {loading ? t('pleaseWait') : t('identify')}
       </button>
 
-      {loading && <p className="loading">AI is reading...</p>}
+      {loading && <p className="loading">{t('aiReading')}</p>}
       {error && <p className="error">{error}</p>}
       {result && <ResultCard data={result} />}
     </section>
