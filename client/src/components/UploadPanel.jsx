@@ -9,6 +9,8 @@ const SOURCE_BADGE = {
   unknown: { key: 'sourceUnknown', cls: 'badge-unknown' },
 }
 
+const hasCoords = (p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng)
+
 function ResultCard({ data }) {
   const { t } = useLanguage()
   const badge = SOURCE_BADGE[data.source] ?? SOURCE_BADGE.unknown
@@ -16,6 +18,7 @@ function ResultCard({ data }) {
   return (
     <div className="result">
       <span className={`source-badge ${badge.cls}`}>{t(badge.key)}</span>
+      {data.aiLocated && <span className="source-badge badge-ai">{t('aiLocated')}</span>}
       <h4>{p.naam}</h4>
       {p.geminiInfo && <p>{p.geminiInfo}</p>}
       {p.translation && <p>{p.translation}</p>}
@@ -33,6 +36,9 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
+
+  // Gemini ne jagah nahi batayi aur user ki location bhi nahi hai: user se poochna hai
+  const needsLocation = result !== null && !hasCoords(result.place) && !location
 
   // Preview ke liye object URL banaate hain aur purana saaf karte hain
   useEffect(() => {
@@ -63,12 +69,9 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
     }
   }
 
+  // Location optional hai: bina location ke bhi Identify chalta hai
   async function handleSubmit() {
     if (!file) return
-    if (mode === 'place' && !location) {
-      setError(t('needLocation'))
-      return
-    }
 
     setLoading(true)
     setError('')
@@ -80,13 +83,27 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
         lat: location?.lat,
         lng: location?.lng,
       })
-      setResult(data)
-      onNewPlace(data.place)
+      // User ki location nahi thi, aur Gemini ne di: use "AI located" badge ke saath dikhao
+      const aiLocated = !location && hasCoords(data.place)
+      setResult({ ...data, aiLocated })
+      // Pin tabhi banega jab jagah pata ho
+      if (hasCoords(data.place)) onNewPlace(data.place)
     } catch {
       setError(t('aiError'))
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      setError(t('locationDenied'))
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => onLocationFound({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setError(t('locationDenied')),
+    )
   }
 
   return (
@@ -143,6 +160,20 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
       {loading && <p className="loading">{t('aiReading')}</p>}
       {error && <p className="error">{error}</p>}
       {result && <ResultCard data={result} />}
+
+      {needsLocation && (
+        <div className="location-ask">
+          <p>{t('askLocation')}</p>
+          <div className="row">
+            <button className="btn ghost small" onClick={handleUseCurrentLocation}>
+              {t('useCurrentLocation')}
+            </button>
+            <button className="btn ghost small" onClick={onTogglePick}>
+              {t('pickOnMap')}
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

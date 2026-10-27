@@ -81,11 +81,43 @@
 }
 
 .stats-updated {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
   font-size: 12px;
+  font-weight: 600;
   color: var(--brown);
-  opacity: 0.8;
   padding: 0 20px 8px;
+}
+
+/* Chhota green dot jo dheere-dheere pulse karta hai, live feel ke liye */
+.live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.live-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--green);
+  animation: live-ping 1.8s ease-out infinite;
+}
+
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
 }
 
 .text-green {
@@ -96,11 +128,11 @@
   color: #b58500;
 }
 
-/* Desktop: sidebar left, map right. Mobile: map upar, panels neeche. */
+/* Desktop: map + handle + sidebar. Mobile: map upar, handle, panels neeche. */
 .layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: var(--map-width, 60%) 8px 1fr;
   height: calc(100vh - 150px);
   min-height: 560px;
 }
@@ -117,6 +149,57 @@
 .map-area {
   position: relative;
   min-height: 0;
+}
+
+/* Fullscreen: map poori screen le le */
+.map-area.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 500;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+/* Drag handle: map aur panel ke beech (desktop par vertical bar) */
+.resize-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sand);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.resize-handle::after {
+  content: '';
+  width: 4px;
+  height: 40px;
+  border-radius: 4px;
+  background: var(--sand-dark);
+}
+
+.resize-handle:hover {
+  background: var(--sand-dark);
+}
+
+.resize-handle:hover::after {
+  background: var(--terracotta);
 }
 
 .map-wrap,
@@ -166,7 +249,19 @@
 
   .map-area {
     order: -1;
-    height: 60vh;
+    height: var(--map-height, 60vh);
+  }
+
+  /* Mobile par handle horizontal bar hai */
+  .resize-handle {
+    order: 0;
+    height: 22px;
+    cursor: row-resize;
+  }
+
+  .resize-handle::after {
+    width: 48px;
+    height: 4px;
   }
 
   .sidebar {
@@ -486,6 +581,116 @@ textarea.input {
   flex-direction: column;
   gap: 8px;
   margin-top: 6px;
+}
+
+/* ---------- Location prompt (upload panel) ---------- */
+.location-ask {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff4cc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* ---------- Listen button (panel) ---------- */
+.listen-btn {
+  align-self: flex-start;
+}
+
+/* ---------- Heritage trails ---------- */
+.trails h3 {
+  margin-bottom: 8px;
+}
+
+.trail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trail-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.trail-item:hover {
+  background: var(--sand);
+}
+
+.trail-item small {
+  color: var(--muted);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.trail-controls {
+  margin-top: 10px;
+}
+
+/* Trail ka numbered marker */
+.trail-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid #fff;
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Add place (header) ---------- */
+.add-place-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--terracotta-dark);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Unknown place: add info form ---------- */
+.file-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.form-photo-preview {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.contributor {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
 }
 
 /* ---------- Upload ---------- */

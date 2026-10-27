@@ -65,6 +65,9 @@ export async function analyzeImage({ file, mode, lat, lng }) {
   return data
 }
 
+// Mock mein AI jab location na de, to ye famous jagah (Lal Qila, Delhi) ki location maani jaati hai
+const FAMOUS_SITE = { lat: 28.6562, lng: 77.241 }
+
 // Fake /api/analyze: pehle archive check, phir random "AI" result
 async function mockAnalyze({ mode, lat, lng }) {
   await wait(1500)
@@ -77,6 +80,9 @@ async function mockAnalyze({ mode, lat, lng }) {
   }
 
   const identified = Math.random() > 0.3
+  // Location: user ki location > AI ki location (famous site) > koi nahi
+  const hasLocation = lat != null && lng != null
+  const coords = hasLocation ? { lat, lng } : identified ? FAMOUS_SITE : null
   const place = {
     _id: `m${Date.now()}`,
     naam: identified
@@ -84,8 +90,8 @@ async function mockAnalyze({ mode, lat, lng }) {
         ? 'Old document (mock)'
         : 'Identified heritage site (mock)'
       : 'Unknown place',
-    lat: lat ?? 22.5,
-    lng: lng ?? 79,
+    lat: coords?.lat ?? null,
+    lng: coords?.lng ?? null,
     type: 'other',
     state: '',
     photo: '',
@@ -99,6 +105,7 @@ async function mockAnalyze({ mode, lat, lng }) {
     status: identified ? 'verified' : 'anjaan',
     createdAt: new Date().toISOString(),
   }
-  mockStore = [...mockStore, place]
+  // Jagah pata ho tabhi pin ban sakta hai, isliye sirf tab store karte hain
+  if (coords) mockStore = [...mockStore, place]
   return { place, source: identified ? 'gemini' : 'unknown' }
 }

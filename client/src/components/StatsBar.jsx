@@ -61,7 +61,10 @@ export default function StatsBar({ total, verified, unknown, updatedAt }) {
           <span>{t('unknown')}</span>
         </div>
       </div>
-      <p className="stats-updated">{updatedText}</p>
+      <p className="stats-updated">
+        <span className="live-dot" />
+        {updatedText}
+      </p>
     </div>
   )
 }

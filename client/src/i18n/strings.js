@@ -1,6 +1,153 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  askLocation: {
+    en: 'Gemini could not find the location. Tell us where this is:',
+    hi: 'Gemini को जगह नहीं मिली। बताइए यह कहाँ है:',
+    bn: 'Gemini জায়গাটি খুঁজে পায়নি। এটি কোথায় বলুন:',
+    ta: 'Gemini இடத்தைக் கண்டறியவில்லை. இது எங்கே என்று சொல்லுங்கள்:',
+  },
+  useCurrentLocation: {
+    en: '📍 Use my current location',
+    hi: '📍 मेरी मौजूदा लोकेशन इस्तेमाल करें',
+    bn: '📍 আমার বর্তমান অবস্থান ব্যবহার করুন',
+    ta: '📍 எனது தற்போதைய இருப்பிடத்தைப் பயன்படுத்து',
+  },
+  locationDenied: {
+    en: 'Could not get your location. Pick it on the map.',
+    hi: 'आपकी लोकेशन नहीं मिल सकी। नक्शे पर चुनें।',
+    bn: 'আপনার অবস্থান পাওয়া যায়নি। মানচিত্রে বাছাই করুন।',
+    ta: 'உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை. வரைபடத்தில் தேர்ந்தெடுக்கவும்.',
+  },
+  aiLocated: {
+    en: '🤖 Location identified by AI',
+    hi: '🤖 AI ने लोकेशन पहचानी',
+    bn: '🤖 AI অবস্থান শনাক্ত করেছে',
+    ta: '🤖 AI இருப்பிடத்தை அடையாளம் கண்டது',
+  },
+  listen: {
+    en: '🔊 Listen',
+    hi: '🔊 सुनें',
+    bn: '🔊 শুনুন',
+    ta: '🔊 கேளுங்கள்',
+  },
+  stopSpeaking: {
+    en: '⏹ Stop',
+    hi: '⏹ रोकें',
+    bn: '⏹ থামান',
+    ta: '⏹ நிறுத்து',
+  },
+  trailsTitle: {
+    en: '🛤️ Trails',
+    hi: '🛤️ ट्रेल्स',
+    bn: '🛤️ ট্রেইল',
+    ta: '🛤️ பாதைகள்',
+  },
+  // {n} ki jagah stops ki ginti aati hai
+  stopsCount: {
+    en: '{n} stops',
+    hi: '{n} स्थान',
+    bn: '{n}টি স্থান',
+    ta: '{n} இடங்கள்',
+  },
+  trailStart: {
+    en: 'Press Next ▶ to start from the first stop',
+    hi: 'पहला स्थान देखने के लिए Next ▶ दबाएँ',
+    bn: 'প্রথম স্থান দেখতে Next ▶ চাপুন',
+    ta: 'முதல் இடத்தைக் காண Next ▶ அழுத்தவும்',
+  },
+  // {n} = abhi ka stop, {total} = kul stops
+  stopCounter: {
+    en: 'Stop {n} of {total}',
+    hi: 'स्थान {n} / {total}',
+    bn: 'স্থান {n} / {total}',
+    ta: 'இடம் {n} / {total}',
+  },
+  prevStop: {
+    en: '◀ Prev',
+    hi: '◀ पिछला',
+    bn: '◀ আগের',
+    ta: '◀ முந்தைய',
+  },
+  nextStop: {
+    en: 'Next ▶',
+    hi: 'अगला ▶',
+    bn: 'পরের ▶',
+    ta: 'அடுத்து ▶',
+  },
+  exitTrail: {
+    en: 'Exit trail',
+    hi: 'ट्रेल बंद करें',
+    bn: 'ট্রেইল বন্ধ করুন',
+    ta: 'பாதையிலிருந்து வெளியேறு',
+  },
+  addInfoBtn: {
+    en: '🙋 I know this place — add its story',
+    hi: '🙋 मुझे यह जगह पता है — इसकी कहानी जोड़ें',
+    bn: '🙋 আমি এই জায়গা চিনি — এর গল্প যোগ করুন',
+    ta: '🙋 இந்த இடம் எனக்குத் தெரியும் — அதன் கதையைச் சேர்க்கவும்',
+  },
+  addPlaceBtn: {
+    en: '➕ Add a hidden heritage place',
+    hi: '➕ कोई छिपी हुई विरासत जोड़ें',
+    bn: '➕ একটি লুকানো ঐতিহ্য যোগ করুন',
+    ta: '➕ மறைந்திருக்கும் பாரம்பரியத்தைச் சேர்க்கவும்',
+  },
+  builtInfoPlaceholder: {
+    en: 'When it was built / by whom (optional)',
+    hi: 'कब बना / किसने बनवाया (वैकल्पिक)',
+    bn: 'কবে তৈরি / কে তৈরি করেছেন (ঐচ্ছিক)',
+    ta: 'எப்போது / யாரால் கட்டப்பட்டது (விருப்பத்தேர்வு)',
+  },
+  photoOptional: {
+    en: 'Photo (optional)',
+    hi: 'फ़ोटो (वैकल्पिक)',
+    bn: 'ছবি (ঐচ্ছিক)',
+    ta: 'படம் (விருப்பத்தேர்வு)',
+  },
+  contributorPlaceholder: {
+    en: 'Your name (optional)',
+    hi: 'आपका नाम (वैकल्पिक)',
+    bn: 'আপনার নাম (ঐচ্ছিক)',
+    ta: 'உங்கள் பெயர் (விருப்பத்தேர்வு)',
+  },
+  // {name} ki jagah contributor ka naam aata hai
+  storyAddedBy: {
+    en: 'Story added by {name}',
+    hi: 'कहानी {name} ने जोड़ी',
+    bn: 'গল্পটি যোগ করেছেন {name}',
+    ta: 'கதை {name} அவர்களால் சேர்க்கப்பட்டது',
+  },
+  photoError: {
+    en: 'Could not read this photo',
+    hi: 'यह फ़ोटो नहीं पढ़ी जा सकी',
+    bn: 'এই ছবিটি পড়া যায়নি',
+    ta: 'இந்தப் படத்தைப் படிக்க முடியவில்லை',
+  },
+  anonymous: {
+    en: 'Anonymous',
+    hi: 'गुमनाम',
+    bn: 'বেনামী',
+    ta: 'அநாமதேயர்',
+  },
+  builtInfo: {
+    en: 'Built',
+    hi: 'निर्माण',
+    bn: 'নির্মাণ',
+    ta: 'கட்டுமானம்',
+  },
+  fullscreen: {
+    en: 'Fullscreen',
+    hi: 'फ़ुलस्क्रीन',
+    bn: 'ফুলস্ক্রিন',
+    ta: 'முழுத்திரை',
+  },
+  exitFullscreen: {
+    en: 'Exit fullscreen',
+    hi: 'फ़ुलस्क्रीन बंद करें',
+    bn: 'ফুলস্ক্রিন বন্ধ করুন',
+    ta: 'முழுத்திரையிலிருந்து வெளியேறு',
+  },
   updatedJustNow: {
     en: 'Updated just now',
     hi: 'अभी अपडेट हुआ',

@@ -1,6 +1,6 @@
 import { LANGUAGES, useLanguage } from '../i18n/LanguageContext'
 
-export default function Header({ isMock }) {
+export default function Header({ isMock, onAddPlace }) {
   const { lang, setLang, t } = useLanguage()
 
   return (
@@ -10,6 +10,9 @@ export default function Header({ isMock }) {
         <p className="tagline">{t('tagline')}</p>
       </div>
       <div className="header-right">
+        <button className="add-place-btn" onClick={onAddPlace}>
+          {t('addPlaceBtn')}
+        </button>
         {isMock && <span className="demo-pill">{t('demoMode')}</span>}
         <select
           className="lang-select"
