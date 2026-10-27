@@ -75,19 +75,19 @@ async function mockAnalyze({ mode, lat, lng }) {
     _id: `m${Date.now()}`,
     naam: identified
       ? mode === 'document'
-        ? 'Purana dastavez (mock)'
-        : 'Pehchani gayi virasat (mock)'
-      : 'Ajnaat sthal',
+        ? 'Old document (mock)'
+        : 'Identified heritage site (mock)'
+      : 'Unknown place',
     lat: lat ?? 22.5,
     lng: lng ?? 79,
     type: 'other',
     state: '',
     photo: '',
     geminiInfo: identified && mode === 'place'
-      ? 'Mock: ye ek puraani sthapatya shaili ki imarat lagti hai. (Ye sirf guess hai.)'
+      ? 'Mock: this looks like a building in an old architectural style. (This is only a guess.)'
       : '',
     translation: identified && mode === 'document'
-      ? 'Mock: Ye Devanagari dastavez ka English translation hai.'
+      ? 'Mock: This is the English translation of the Devanagari document.'
       : '',
     userKahani: '',
     status: identified ? 'verified' : 'anjaan',

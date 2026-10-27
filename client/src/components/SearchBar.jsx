@@ -1,8 +1,8 @@
 const TYPE_CHIPS = [
   { value: 'all', label: 'All' },
   { value: 'baoli', label: 'Baoli' },
-  { value: 'kila', label: 'Kila' },
-  { value: 'mandir', label: 'Mandir' },
+  { value: 'kila', label: 'Fort' },
+  { value: 'mandir', label: 'Temple' },
 ]
 
 export default function SearchBar({ query, onQueryChange, typeFilter, onTypeChange, results, onResultClick }) {
@@ -11,7 +11,7 @@ export default function SearchBar({ query, onQueryChange, typeFilter, onTypeChan
       <input
         className="input"
         type="search"
-        placeholder="Naam, state ya type se dhundho..."
+        placeholder="Search by name, state or type..."
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
       />
@@ -30,7 +30,7 @@ export default function SearchBar({ query, onQueryChange, typeFilter, onTypeChan
 
       {query.trim() && (
         <ul className="results">
-          {results.length === 0 && <li className="muted">Koi jagah nahi mili</li>}
+          {results.length === 0 && <li className="muted">No places found</li>}
           {results.map((p) => (
             <li key={p._id}>
               <button className="result-item" onClick={() => onResultClick(p)}>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { updatePlace } from '../api'
 import { photoSrc } from '../utils'
 
-const TYPE_LABEL = { baoli: 'Baoli', kila: 'Kila', mandir: 'Mandir', other: 'Anya' }
+const TYPE_LABEL = { baoli: 'Baoli', kila: 'Fort', mandir: 'Temple', other: 'Other' }
 
 
 function Section({ title, text }) {
@@ -28,7 +28,7 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!naam.trim()) {
-      setError('Jagah ka naam likhna zaroori hai')
+      setError('Place name is required')
       return
     }
     setSaving(true)
@@ -38,7 +38,7 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
       onUpdated(updated)
       setEditing(false)
     } catch {
-      setError('Save nahi ho paya. Backend check karo.')
+      setError('Could not save. Please check the backend.')
     } finally {
       setSaving(false)
     }
@@ -46,7 +46,7 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
 
   return (
     <article className="card detail">
-      <button className="icon-btn close" onClick={onClose} aria-label="Band karo">
+      <button className="icon-btn close" onClick={onClose} aria-label="Close">
         ×
       </button>
 
@@ -58,17 +58,17 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
 
       <div className="detail-body">
         <span className={`status-badge ${place.status}`}>
-          {isUnknown ? 'Anjaan – madad chahiye' : 'Verified'}
+          {isUnknown ? 'Unknown – help needed' : 'Verified'}
         </span>
         <h2>{place.naam}</h2>
         <p className="meta">
-          {TYPE_LABEL[place.type] ?? place.type} · {place.state || 'State nahi pata'}
+          {TYPE_LABEL[place.type] ?? place.type} · {place.state || 'State unknown'}
         </p>
 
-        {place.geminiInfo && <Section title="AI ki jaankari" text={place.geminiInfo} />}
+        {place.geminiInfo && <Section title="AI information" text={place.geminiInfo} />}
         {place.translation && <Section title="Translation" text={place.translation} />}
-        {place.userKahani && <Section title="Logon ki kahani" text={place.userKahani} />}
-        {!hasInfo && <p className="muted">Is jagah ki abhi koi jaankari nahi hai.</p>}
+        {place.userKahani && <Section title="Community story" text={place.userKahani} />}
+        {!hasInfo && <p className="muted">No information about this place yet.</p>}
 
         {isUnknown && !editing && (
           <button className="btn primary" onClick={() => setEditing(true)}>
@@ -80,20 +80,20 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
           <form className="add-info" onSubmit={handleSubmit}>
             <input
               className="input"
-              placeholder="Jagah ka naam"
+              placeholder="Place name"
               value={naam}
               onChange={(e) => setNaam(e.target.value)}
             />
             <textarea
               className="input"
               rows={4}
-              placeholder="Iski kahani, history ya jo aap jaante hain..."
+              placeholder="Its story, history, or anything you know..."
               value={story}
               onChange={(e) => setStory(e.target.value)}
             />
             <div className="row">
               <button className="btn primary" disabled={saving}>
-                {saving ? 'Save ho raha hai...' : 'Save karo'}
+                {saving ? 'Saving...' : 'Save'}
               </button>
               <button type="button" className="btn ghost" onClick={() => setEditing(false)}>
                 Cancel

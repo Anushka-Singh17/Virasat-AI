@@ -3,7 +3,7 @@ export default function StatsBar({ total, verified, unknown }) {
     <div className="stats">
       <div className="stat">
         <strong>{total}</strong>
-        <span>Total sthal</span>
+        <span>Total places</span>
       </div>
       <div className="stat">
         <strong className="text-green">{verified}</strong>
@@ -11,7 +11,7 @@ export default function StatsBar({ total, verified, unknown }) {
       </div>
       <div className="stat">
         <strong className="text-yellow">{unknown}</strong>
-        <span>Anjaan</span>
+        <span>Unknown</span>
       </div>
     </div>
   )

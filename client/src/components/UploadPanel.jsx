@@ -3,8 +3,8 @@ import exifr from 'exifr'
 import { analyzeImage } from '../api'
 
 const SOURCE_BADGE = {
-  database: { text: 'Hamare archive mein mila', cls: 'badge-db' },
-  gemini: { text: 'AI ne pehchana', cls: 'badge-ai' },
+  database: { text: 'Found in our archive', cls: 'badge-db' },
+  gemini: { text: 'Identified by AI', cls: 'badge-ai' },
   unknown: { text: 'Unknown – help us!', cls: 'badge-unknown' },
 }
 
@@ -18,7 +18,7 @@ function ResultCard({ data }) {
       {p.geminiInfo && <p>{p.geminiInfo}</p>}
       {p.translation && <p>{p.translation}</p>}
       {data.source === 'unknown' && (
-        <p className="hint">Map par is pin ko kholo aur "Add info" dabao.</p>
+        <p className="hint">Open this pin on the map and click "Add info".</p>
       )}
     </div>
   )
@@ -47,25 +47,25 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
     setFile(chosen)
     setResult(null)
     setError('')
-    setGpsNote('Photo se GPS padh raha hoon...')
+    setGpsNote('Reading GPS from photo...')
 
     try {
       const gps = await exifr.gps(chosen)
       if (gps?.latitude && gps?.longitude) {
         onLocationFound({ lat: gps.latitude, lng: gps.longitude })
-        setGpsNote('Photo se GPS mil gaya ✅')
+        setGpsNote('GPS found in photo ✅')
       } else {
-        setGpsNote('Is photo mein GPS nahi hai. Map par click karke location chuno.')
+        setGpsNote('No GPS in this photo. Click on the map to choose a location.')
       }
     } catch {
-      setGpsNote('GPS padhne mein dikkat aayi. Map par location chuno.')
+      setGpsNote('Could not read GPS. Choose a location on the map.')
     }
   }
 
   async function handleSubmit() {
     if (!file) return
     if (mode === 'place' && !location) {
-      setError('Place photo ke liye location chahiye (GPS ya map click)')
+      setError('A location is needed for place photos (GPS or map click)')
       return
     }
 
@@ -82,7 +82,7 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
       setResult(data)
       onNewPlace(data.place)
     } catch {
-      setError('AI check nahi kar paya. Backend chal raha hai ya nahi, dekho.')
+      setError('AI could not check this. Make sure the backend is running.')
     } finally {
       setLoading(false)
     }
@@ -90,7 +90,7 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
 
   return (
     <section className="card upload">
-      <h3>Virasat ka photo ya dastavez daalo</h3>
+      <h3>Upload a heritage photo or document</h3>
 
       <div className="tabs" role="tablist">
         <button
@@ -112,7 +112,7 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
         {preview ? (
           <img src={preview} alt="Preview" />
         ) : (
-          <span>📷 Tap karke photo chuno</span>
+          <span>📷 Tap to choose a photo</span>
         )}
       </label>
 
@@ -125,21 +125,21 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
               {location
                 ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
                 : mode === 'document'
-                  ? 'Location optional hai'
-                  : 'Location abhi nahi'}
+                  ? 'Location is optional'
+                  : 'No location yet'}
             </span>
             <button className="btn ghost small" onClick={onTogglePick}>
-              {pickMode ? 'Cancel' : 'Map par chuno'}
+              {pickMode ? 'Cancel' : 'Pick on map'}
             </button>
           </div>
         </>
       )}
 
       <button className="btn primary full" disabled={!file || loading} onClick={handleSubmit}>
-        {loading ? 'Ruko...' : 'Pehchaano'}
+        {loading ? 'Please wait...' : 'Identify'}
       </button>
 
-      {loading && <p className="loading">AI padh raha hai...</p>}
+      {loading && <p className="loading">AI is reading...</p>}
       {error && <p className="error">{error}</p>}
       {result && <ResultCard data={result} />}
     </section>

@@ -29,7 +29,7 @@ export default function App() {
       })
       .catch(() => {
         if (!ignore) {
-          setLoadError('Backend abhi chal nahi raha. Server start karo, ya .env mein VITE_USE_MOCK=true karke demo dekho.')
+          setLoadError('Backend is not running. Start the server, or set VITE_USE_MOCK=true in .env to view the demo.')
         }
       })
       .finally(() => {
@@ -94,9 +94,9 @@ export default function App() {
 
       <div className="layout">
         <main className="map-area">
-          {loading && <div className="map-overlay">Map load ho raha hai...</div>}
+          {loading && <div className="map-overlay">Loading map...</div>}
           {!loading && !loadError && places.length === 0 && (
-            <div className="map-overlay">Abhi koi jagah nahi mili. Pehli photo upload karo!</div>
+            <div className="map-overlay">No places found yet. Upload the first photo!</div>
           )}
           <MapView
             places={filtered}
@@ -122,7 +122,7 @@ export default function App() {
             <div className="banner error-banner">
               <p>{loadError}</p>
               <button className="btn ghost small" onClick={() => window.location.reload()}>
-                Dobara try karo
+                Try again
               </button>
             </div>
           )}

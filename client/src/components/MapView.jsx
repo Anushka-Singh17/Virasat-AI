@@ -46,7 +46,7 @@ export default function MapView({ places, onSelect, flyTarget, pickMode, onPick,
         {location && <Marker position={[location.lat, location.lng]} />}
       </MapContainer>
 
-      {pickMode && <div className="pick-hint">Map par click karke location chuno</div>}
+      {pickMode && <div className="pick-hint">Click on the map to choose a location</div>}
     </div>
   )
 }
