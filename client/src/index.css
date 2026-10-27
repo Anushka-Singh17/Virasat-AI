@@ -1,0 +1,59 @@
+/* Heritage theme: sandstone, terracotta, cream */
+:root {
+  --cream: #fbf5ea;
+  --sand: #e8c9a0;
+  --sand-dark: #c9a06b;
+  --terracotta: #b5532e;
+  --terracotta-dark: #8f3e20;
+  --brown: #4a2c1a;
+  --muted: #8a7261;
+  --card: #ffffff;
+  --green: #2e7d4f;
+  --yellow: #e0a800;
+  --red: #b3261e;
+  --shadow: 0 6px 18px rgba(74, 44, 26, 0.12);
+  --radius: 14px;
+
+  --heading: 'Playfair Display', Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  color-scheme: light;
+  color: var(--brown);
+  background: var(--cream);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--heading);
+  color: var(--brown);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
