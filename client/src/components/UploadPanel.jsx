@@ -47,11 +47,14 @@ export default function UploadPanel({
   // Request chalte waqt dobara submit na ho (button disabled hone se pehle ka gap bhi band)
   const submittingRef = useRef(false)
 
-  // Do alag file inputs: camera (seedha back camera) aur gallery. Dono button se trigger hote hain.
+  // Do alag file inputs: camera (seedha back camera) aur gallery
   const cameraRef = useRef(null)
   const galleryRef = useRef(null)
-  // "Take photo" sirf touch device (phone/tablet) par. Desktop par camera ka matlab nahi, wahan sirf "Choose photo".
-  const [canTakePhoto] = useState(() => window.matchMedia('(pointer: coarse)').matches)
+  // Mobile (<= 768px, CSS ke breakpoint jaisa): dashed box nahi, sirf do bade buttons.
+  // Desktop: sirf dashed box (click ya drag & drop), koi alag button nahi.
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches)
+  const [dragging, setDragging] = useState(false) // desktop: photo box ke upar khinch kar laayi gayi
+  const [changing, setChanging] = useState(false) // mobile: "Change photo" dabaya, buttons dobara dikhao
   // Camera se photo aayi aur usme GPS nahi tha: "Are you at this place right now?" poochna hai
   const [cameraNoGps, setCameraNoGps] = useState(false)
 
@@ -66,15 +69,41 @@ export default function UploadPanel({
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  // source: "camera" (Take photo) ya "gallery" (Choose photo)
-  async function handleFile(e, source) {
+  // Window ki chaudai badle (jaise phone ghumaya) to mobile/desktop dikhawat apne aap badle
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 768px)')
+    const onChange = (e) => setIsMobile(e.matches)
+    query.addEventListener('change', onChange)
+    return () => query.removeEventListener('change', onChange)
+  }, [])
+
+  // File input se photo aayi. source: "camera" (Take photo) ya "gallery"
+  function handleFile(e, source) {
     const chosen = e.target.files?.[0]
     e.target.value = '' // wahi photo dobara chunne par bhi change event aaye
-    if (!chosen) return
+    if (chosen) processFile(chosen, source)
+  }
+
+  // Desktop: dashed box par photo chhodi gayi (drag & drop)
+  function handleDrop(e) {
+    e.preventDefault()
+    setDragging(false)
+    const dropped = e.dataTransfer.files?.[0]
+    if (!dropped) return
+    if (!dropped.type.startsWith('image/')) {
+      setError(t('notImage'))
+      return
+    }
+    processFile(dropped, 'gallery')
+  }
+
+  // Photo mil gayi (kisi bhi tareeke se): preview, GPS padhna, purana result saaf
+  async function processFile(chosen, source) {
     setFile(chosen)
     setResult(null)
     setError('')
     setCameraNoGps(false)
+    setChanging(false)
     setGpsNote(t('readingGps'))
 
     try {
@@ -158,42 +187,78 @@ export default function UploadPanel({
         </button>
       </div>
 
-      <label className="dropzone">
-        <input
-          ref={galleryRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => handleFile(e, 'gallery')}
-        />
-        {preview ? (
-          <img src={preview} alt={t('previewAlt')} />
-        ) : (
-          <span>📷 {t('choosePhoto')}</span>
-        )}
-      </label>
+      {isMobile ? (
+        <>
+          {/* Mobile: dashed box nahi. Photo aane ke baad preview + "Change photo"; pehle ya change par do bade buttons */}
+          {preview && <img className="photo-preview" src={preview} alt={t('previewAlt')} />}
 
-      {/* Camera input: capture="environment" se seedha back camera khulta hai (sirf touch devices par) */}
-      {canTakePhoto && (
-        <input
-          ref={cameraRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          hidden
-          onChange={(e) => handleFile(e, 'camera')}
-        />
+          {preview && !changing ? (
+            <button type="button" className="link-btn" onClick={() => setChanging(true)}>
+              {t('changePhoto')}
+            </button>
+          ) : (
+            <div className="photo-buttons big">
+              <button type="button" className="btn ghost" onClick={() => cameraRef.current?.click()}>
+                {t('takePhoto')}
+              </button>
+              <button type="button" className="btn ghost" onClick={() => galleryRef.current?.click()}>
+                {t('chooseGallery')}
+              </button>
+            </div>
+          )}
+
+          {/* capture="environment": seedha back camera khulta hai */}
+          <input
+            ref={cameraRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={(e) => handleFile(e, 'camera')}
+          />
+          <input
+            ref={galleryRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => handleFile(e, 'gallery')}
+          />
+        </>
+      ) : (
+        <>
+          {/* Desktop: sirf dashed box. Click se picker, ya photo yahan khinch kar chhodo. */}
+          <label
+            className={`dropzone ${dragging ? 'dragging' : ''}`}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setDragging(true)
+            }}
+            onDragLeave={(e) => {
+              // Box ke andar ke bachchon (jaise preview image) par jaane se highlight na hate
+              if (!e.currentTarget.contains(e.relatedTarget)) setDragging(false)
+            }}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={galleryRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFile(e, 'gallery')}
+            />
+            {preview ? (
+              <img src={preview} alt={t('previewAlt')} />
+            ) : (
+              <span>{t('dropHint')}</span>
+            )}
+          </label>
+
+          {preview && (
+            <button type="button" className="link-btn" onClick={() => galleryRef.current?.click()}>
+              {t('changePhoto')}
+            </button>
+          )}
+        </>
       )}
-
-      <div className="row photo-buttons">
-        {canTakePhoto && (
-          <button type="button" className="btn ghost" onClick={() => cameraRef.current?.click()}>
-            {t('takePhoto')}
-          </button>
-        )}
-        <button type="button" className="btn ghost" onClick={() => galleryRef.current?.click()}>
-          {canTakePhoto ? t('chooseGallery') : t('choosePhotoBtn')}
-        </button>
-      </div>
 
       {file && (
         <>

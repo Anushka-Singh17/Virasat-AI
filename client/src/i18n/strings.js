@@ -1,6 +1,24 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  dropHint: {
+    en: 'Click or drag a photo here',
+    hi: 'फ़ोटो यहाँ क्लिक करें या खींचकर छोड़ें',
+    bn: 'ছবি এখানে ক্লিক করুন বা টেনে আনুন',
+    ta: 'புகைப்படத்தை இங்கே கிளிக் செய்யவும் அல்லது இழுத்து விடவும்',
+  },
+  changePhoto: {
+    en: 'Change photo',
+    hi: 'फ़ोटो बदलें',
+    bn: 'ছবি বদলান',
+    ta: 'புகைப்படத்தை மாற்றவும்',
+  },
+  notImage: {
+    en: 'Please drop an image file',
+    hi: 'कृपया कोई फ़ोटो (image) फ़ाइल डालें',
+    bn: 'অনুগ্রহ করে একটি ছবির ফাইল দিন',
+    ta: 'தயவுசெய்து ஒரு பட கோப்பை இடவும்',
+  },
   takePhoto: {
     en: '📷 Take photo',
     hi: '📷 फ़ोटो खींचें',
