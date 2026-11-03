@@ -5,6 +5,7 @@ import SearchBar from './components/SearchBar'
 import MapView from './components/MapView'
 import PlaceDetail from './components/PlaceDetail'
 import UploadPanel from './components/UploadPanel'
+import AddPlaceModal from './components/AddPlaceModal'
 import TrailsPanel from './components/TrailsPanel'
 import { TRAILS } from './trails'
 import { getPlaces, getStats, isMock } from './api'
@@ -45,6 +46,17 @@ export default function App() {
   // Trail: chuni hui trail ka id, aur abhi kaun sa stop (null = abhi start nahi hua)
   const [activeTrailId, setActiveTrailId] = useState(null)
   const [stopIndex, setStopIndex] = useState(null)
+
+  // Header ka "Add a hidden heritage place" popup, aur success par "Thank you!" message
+  const [addOpen, setAddOpen] = useState(false)
+  const [thanks, setThanks] = useState(false)
+
+  // Thank you message 3 second baad apne aap gayab
+  useEffect(() => {
+    if (!thanks) return
+    const timer = setTimeout(() => setThanks(false), 3000)
+    return () => clearTimeout(timer)
+  }, [thanks])
 
   // Real mode mein stats backend se aate hain, aur kab update hue ye bhi yaad rakhte hain
   const [serverStats, setServerStats] = useState({ total: 0, verified: 0, unknown: 0 })
@@ -119,7 +131,7 @@ export default function App() {
   // Mock mode mein stats places se ginte hain
   const localStats = {
     total: places.length,
-    verified: places.filter((p) => p.status === 'verified').length,
+    verified: places.filter((p) => p.status === 'verified' || p.status === 'community').length,
     unknown: places.filter((p) => p.status === 'anjaan').length,
   }
   const stats = isMock ? localStats : serverStats
@@ -183,9 +195,31 @@ export default function App() {
     setPickMode(false)
   }
 
-  // Header ke button se upload panel tak scroll karo
-  function openUploadPanel() {
-    document.querySelector('.upload')?.scrollIntoView({ behavior: 'smooth' })
+  // Header ke button se popup form khulta hai
+  function openAddPlace() {
+    setAddOpen(true)
+  }
+
+  // Modal ke andar "Use my current location"
+  function getMyLocation() {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+    )
+  }
+
+  // Modal se map par location chunne ka mode on karo
+  function pickOnMapForPlace() {
+    setPickMode(true)
+    document.querySelector('.map-area')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Naya sthal bana: modal band, pin par fly, thank you message
+  function handlePlaceCreated(place) {
+    handleNewPlace(place)
+    setAddOpen(false)
+    setThanks(true)
   }
 
   function togglePick() {
@@ -225,8 +259,21 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header isMock={isMock} onAddPlace={openUploadPanel} />
+      <Header isMock={isMock} onAddPlace={openAddPlace} />
       <StatsBar {...stats} updatedAt={statsUpdatedAt} />
+
+      <AddPlaceModal
+        open={addOpen && !pickMode}
+        location={location}
+        onClose={() => setAddOpen(false)}
+        onUseCurrent={getMyLocation}
+        onPickOnMap={pickOnMapForPlace}
+        places={places}
+        onLocationChosen={setLocation}
+        onCreated={handlePlaceCreated}
+      />
+
+      {thanks && <div className="toast">{t('thankYou')}</div>}
 
       <div
         className="layout"
@@ -246,6 +293,7 @@ export default function App() {
             onPick={handleMapPick}
             location={location}
             fullscreen={fullscreen}
+            onLocationDrag={setLocation}
             onToggleFullscreen={() => setFullscreen((on) => !on)}
             trailStops={trailStops}
           />

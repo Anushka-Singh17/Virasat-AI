@@ -487,7 +487,8 @@ textarea.input {
   flex-shrink: 0;
 }
 
-.dot.verified {
+.dot.verified,
+.dot.community {
   background: var(--green);
 }
 
@@ -657,6 +658,219 @@ textarea.input {
   font-size: 13px;
   border: 2px solid #fff;
   box-shadow: var(--shadow);
+}
+
+/* ---------- Mini map, confirm boxes, update badge (add place popup) ---------- */
+.mini-map {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+}
+
+/* Modal flex column hai: bachche (mini map, textarea) shrink hokar dab jaate the. Ab nahi dabenge, modal scroll hoga. */
+.modal > * {
+  flex-shrink: 0;
+}
+
+/* Search box aur button ek hi line mein */
+.search-location .row {
+  flex-wrap: nowrap;
+}
+
+.search-location .row .input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+/* Search results ke group ke label ("On Virasat AI", "Places in India") */
+.result-group {
+  padding: 6px 10px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+
+/* Search result: chhota pulsing circle (area dikhane ke liye) */
+.search-pulse {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(91, 42, 166, 0.3);
+  border: 2px solid #5b2aa6;
+  animation: search-pulse 1.6s ease-out infinite;
+}
+
+@keyframes search-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0.2;
+  }
+}
+
+/* Nayi location ka laal pin */
+.pin-new {
+  background: #d32f2f;
+}
+
+/* Mini map ke neeche legend */
+.map-legend {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Highlight kiya hua pin */
+
+.pin-highlight {
+  transform: rotate(-45deg) scale(1.35);
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.85),
+    0 0 14px 6px rgba(181, 83, 46, 0.6);
+}
+
+.confirm-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--cream);
+  font-size: 14px;
+}
+
+.confirm-box.warn {
+  background: #fff4cc;
+}
+
+.confirm-box p {
+  margin: 0;
+}
+
+.ok-note {
+  color: var(--green);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.update-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--sand);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ---------- Satellite toggle, location search, approx note ---------- */
+.satellite-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 500;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.search-location {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.approx-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a5d00;
+  background: #fff4cc;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ---------- Add place popup (modal) ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(74, 44, 26, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.modal-row .input {
+  min-width: 0;
+}
+
+.location-row {
+  flex-wrap: wrap;
+}
+
+/* "Thank you!" message, neeche bayein */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2100;
+  background: var(--green);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 /* ---------- Add place (header) ---------- */

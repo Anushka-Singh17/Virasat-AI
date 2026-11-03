@@ -9,7 +9,7 @@ import {
   useMap,
   useMapEvents,
 } from 'react-leaflet'
-import { pinIcons, trailIcon } from '../leafletIcons'
+import { newPlaceIcon, pinIcons, trailIcon } from '../leafletIcons'
 import { useLanguage } from '../i18n/LanguageContext'
 
 const INDIA_CENTER = [22.5, 79]
@@ -97,9 +97,11 @@ export default function MapView({
   fullscreen,
   onToggleFullscreen,
   trailStops,
+  onLocationDrag,
 }) {
   const { t } = useLanguage()
   const [india, setIndia] = useState(null)
+  const [satellite, setSatellite] = useState(false)
 
   // public/data/india-boundary.geojson se India ka outline lo
   useEffect(() => {
@@ -144,10 +146,19 @@ export default function MapView({
         maxBoundsViscosity={1.0}
         className={`map ${pickMode ? 'picking' : ''}`}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {satellite ? (
+          <TileLayer
+            key="satellite"
+            attribution='Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          />
+        ) : (
+          <TileLayer
+            key="osm"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        )}
 
         {maskPositions && (
           <Polygon
@@ -172,15 +183,32 @@ export default function MapView({
           <Marker
             key={p._id}
             position={[p.lat, p.lng]}
-            icon={pinIcons[p.status] ?? pinIcons.anjaan}
+            icon={p.status === 'anjaan' ? pinIcons.anjaan : pinIcons.verified}
             eventHandlers={{ click: () => onSelect(p) }}
           />
         ))}
 
-        {location && <Marker position={[location.lat, location.lng]} />}
+        {location && (
+          <Marker
+            position={[location.lat, location.lng]}
+            icon={newPlaceIcon}
+            draggable
+            eventHandlers={{
+              // Marker khinchne ke baad nayi lat/lng app mein save karo
+              dragend: (e) => {
+                const { lat, lng } = e.target.getLatLng()
+                onLocationDrag?.({ lat, lng })
+              },
+            }}
+          />
+        )}
 
         {trailStops && trailStops.length > 0 && <TrailLayer stops={trailStops} />}
       </MapContainer>
+
+      <button className="satellite-btn" onClick={() => setSatellite((on) => !on)}>
+        {satellite ? t('mapView') : t('satelliteView')}
+      </button>
 
       <button className="fullscreen-btn" onClick={onToggleFullscreen}>
         ⛶ {fullscreen ? t('exitFullscreen') : t('fullscreen')}

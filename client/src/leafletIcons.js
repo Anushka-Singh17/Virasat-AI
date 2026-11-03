@@ -41,3 +41,34 @@ export function trailIcon(n) {
   }
   return trailIcons[n]
 }
+
+// Search result: pin nahi, sirf ek chhota pulsing circle (area dikhane ke liye)
+export const searchIcon = L.divIcon({
+  className: 'pin-wrapper',
+  html: '<span class="search-pulse"></span>',
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+})
+
+// User ki chuni hui NAYI location: laal pin (default neela marker ki jagah)
+export const newPlaceIcon = L.divIcon({
+  className: 'pin-wrapper',
+  html: '<span class="pin pin-new"></span>',
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+})
+
+// Highlight kiya hua pin: bada aur glow ke saath. Har rang ka icon ek baar banakar cache karte hain
+const highlightIcons = {}
+export function highlightIcon(status) {
+  const kind = status === 'anjaan' ? 'anjaan' : 'verified'
+  if (!highlightIcons[kind]) {
+    highlightIcons[kind] = L.divIcon({
+      className: 'pin-wrapper',
+      html: `<span class="pin pin-${kind} pin-highlight"></span>`,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+    })
+  }
+  return highlightIcons[kind]
+}

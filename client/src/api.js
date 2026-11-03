@@ -38,6 +38,48 @@ export async function getStats() {
   return data
 }
 
+// Jagah/gaon ka naam dhoondo (OpenStreetMap ka Nominatim, sirf India). Har keystroke par nahi, sirf Search par call hota hai.
+export async function searchPlaces(query) {
+  const params = new URLSearchParams({ format: 'json', countrycodes: 'in', limit: '5', q: query })
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+    headers: { 'Accept-Language': 'en' },
+  })
+  if (!res.ok) throw new Error('Search failed')
+  const data = await res.json()
+  return data.map((item) => ({
+    label: item.display_name,
+    lat: Number(item.lat),
+    lng: Number(item.lon),
+  }))
+}
+
+// Nayi jagah banao (hidden heritage place form se)
+export async function createPlace(body) {
+  if (isMock) {
+    await wait(500)
+    const place = {
+      _id: `m${Date.now()}`,
+      type: 'other',
+      state: '',
+      photo: '',
+      geminiInfo: '',
+      translation: '',
+      history: '',
+      builtBy: '',
+      era: '',
+      sources: [],
+      userKahani: '',
+      contributorName: '',
+      ...body,
+      createdAt: new Date().toISOString(),
+    }
+    mockStore = [...mockStore, place]
+    return { ...place }
+  }
+  const { data } = await http.post('/api/places', body)
+  return data
+}
+
 export async function updatePlace(id, body) {
   if (isMock) {
     await wait(500)

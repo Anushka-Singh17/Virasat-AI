@@ -20,7 +20,8 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
   const [speaking, setSpeaking] = useState(false)
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
   const [naam, setNaam] = useState('')
-  const [builtInfo, setBuiltInfo] = useState('')
+  const [builtBy, setBuiltBy] = useState('')
+  const [era, setEra] = useState('')
   const [story, setStory] = useState('')
   const [photo, setPhoto] = useState('')
   const [contributor, setContributor] = useState('')
@@ -76,7 +77,8 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
     const body = {
       naam: naam.trim(),
       userKahani: story.trim(),
-      builtInfo: builtInfo.trim(),
+      builtBy: builtBy.trim(),
+      era: era.trim(),
       contributorName: contributor.trim(),
     }
     if (photo) body.photo = photo
@@ -115,9 +117,13 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
 
         {place.geminiInfo && <Section title={t('aiInfo')} text={place.geminiInfo} />}
         {place.translation && <Section title={t('translation')} text={place.translation} />}
-        {place.builtInfo && <Section title={t('builtInfo')} text={place.builtInfo} />}
+        {(place.builtBy || place.era) && (
+          <Section title={t('builtInfo')} text={[place.builtBy, place.era].filter(Boolean).join(' · ')} />
+        )}
         {place.userKahani && <Section title={t('communityStory')} text={place.userKahani} />}
         {!hasInfo && <p className="muted">{t('noInfo')}</p>}
+
+        {place.locationApprox && <p className="approx-note">{t('approxLocation')}</p>}
 
         {place.contributorName != null && (
           <p className="contributor">
@@ -147,9 +153,15 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
             />
             <input
               className="input"
-              placeholder={t('builtInfoPlaceholder')}
-              value={builtInfo}
-              onChange={(e) => setBuiltInfo(e.target.value)}
+              placeholder={t('builtByPlaceholder')}
+              value={builtBy}
+              onChange={(e) => setBuiltBy(e.target.value)}
+            />
+            <input
+              className="input"
+              placeholder={t('eraPlaceholder')}
+              value={era}
+              onChange={(e) => setEra(e.target.value)}
             />
             <textarea
               className="input"
