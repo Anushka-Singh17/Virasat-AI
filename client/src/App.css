@@ -240,46 +240,7 @@
   box-shadow: var(--shadow);
 }
 
-@media (max-width: 768px) {
-  .layout {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .map-area {
-    order: -1;
-    height: var(--map-height, 60vh);
-  }
-
-  /* Mobile par handle horizontal bar hai */
-  .resize-handle {
-    order: 0;
-    height: 22px;
-    cursor: row-resize;
-  }
-
-  .resize-handle::after {
-    width: 48px;
-    height: 4px;
-  }
-
-  .sidebar {
-    overflow: visible;
-  }
-
-  .stats {
-    padding: 10px 12px;
-  }
-
-  .brand {
-    font-size: 22px;
-  }
-
-  .tagline {
-    font-size: 12px;
-  }
-}
+/* Mobile ke saare rules file ke aakhir mein ("Mobile (<= 768px)") hain */
 
 /* ---------- Pins (custom marker) ---------- */
 .pin-wrapper {
@@ -908,6 +869,14 @@ textarea.input {
 }
 
 /* ---------- Upload ---------- */
+.photo-buttons {
+  margin-top: 8px;
+}
+
+.photo-buttons .btn {
+  flex: 1 1 auto;
+}
+
 .tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1002,4 +971,425 @@ textarea.input {
 .source-badge.badge-unknown {
   background: #fff4cc;
   color: #7a5d00;
+}
+
+/* =====================================================================
+   Mobile (<= 768px)
+   Desktop layout waisa hi rehta hai. Ye sab sirf chhoti screen par lagta hai.
+   ===================================================================== */
+
+/* Ye cheezein sirf mobile par dikhti hain, desktop par chhupi rehti hain */
+.fab,
+.upload-close,
+.sheet-handle {
+  display: none;
+}
+
+/* Desktop par search/trails/banner ka wrapper kuch nahi karta (bachche pehle jaise hi rehte hain) */
+.top-stack {
+  display: contents;
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Page scroll nahi: map poori screen, andar ke panels khud scroll karte hain */
+  .app {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ---------- Header chhota ---------- */
+  .header {
+    padding: 6px 12px;
+    min-height: 56px;
+    gap: 8px;
+  }
+
+  .header > div:first-child {
+    min-width: 0;
+  }
+
+  .brand {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .tagline,
+  .add-place-btn {
+    display: none; /* "Add hidden place" ab neeche floating + button hai */
+  }
+
+  .header-right {
+    gap: 6px;
+  }
+
+  .demo-pill {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .lang-select {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  /* ---------- Stats ek line mein ---------- */
+  .stats {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .stat {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    padding: 6px 4px;
+  }
+
+  .stat strong {
+    font-size: 16px;
+  }
+
+  .stat span {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stats-updated {
+    display: none;
+  }
+
+  /* ---------- Map poori screen ---------- */
+  .layout {
+    display: block;
+    position: relative;
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+
+  .map-area,
+  .map-area.fullscreen {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    z-index: auto;
+  }
+
+  .resize-handle,
+  .fullscreen-btn,
+  .map-wrap .leaflet-control-zoom {
+    display: none; /* map pehle se poori screen hai, aur pinch se zoom hota hai */
+  }
+
+  .satellite-btn {
+    top: auto;
+    bottom: 16px;
+    left: 12px;
+    min-height: 44px;
+    padding: 0 14px;
+  }
+
+  .map-overlay,
+  .toast {
+    top: auto;
+    bottom: 92px;
+    max-width: calc(100vw - 32px);
+    white-space: normal;
+    text-align: center;
+  }
+
+  .pick-hint {
+    bottom: 92px;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+  }
+
+  /* Sidebar ka dabba hat jaata hai, uske bachche (search, detail, upload) alag jagah baithte hain */
+  .sidebar {
+    display: contents;
+  }
+
+  /* ---------- Search + trails: map ke upar, compact ---------- */
+  .top-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    z-index: 800;
+    pointer-events: none; /* khali jagah par map touch hota rahe */
+  }
+
+  .top-stack > * {
+    pointer-events: auto;
+  }
+
+  .search.card {
+    padding: 8px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+
+  .results {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  .result-item {
+    min-height: 44px;
+  }
+
+  .trails.card {
+    padding: 6px 8px;
+  }
+
+  .trails h3 {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .trail-list {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+
+  .trail-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .trail-item {
+    width: auto;
+    flex: 0 0 auto;
+    min-height: 44px;
+    white-space: nowrap;
+    border: 1px solid var(--sand);
+    font-size: 13px;
+  }
+
+  .top-stack .error-banner {
+    border-radius: 14px;
+  }
+
+  /* ---------- Place detail: neeche se upar aane wali bottom sheet ---------- */
+  .detail {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 900;
+    height: var(--sheet-h, 45vh);
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -8px 24px rgba(74, 44, 26, 0.25);
+  }
+
+  .sheet-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 28px;
+    touch-action: none; /* khinchne par page scroll na ho */
+    cursor: grab;
+  }
+
+  .sheet-handle::after {
+    content: '';
+    width: 44px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--sand-dark);
+  }
+
+  .detail .close {
+    top: 4px;
+    right: 6px;
+    width: 44px;
+    height: 44px;
+    z-index: 2;
+  }
+
+  .detail-photo,
+  .photo-placeholder {
+    height: 110px;
+    flex-shrink: 0;
+  }
+
+  .detail-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 28px;
+  }
+
+  /* ---------- Upload panel: full-screen (FAB se khulta hai) ---------- */
+  .upload {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    border-radius: 0;
+    overflow-y: auto;
+    padding: 64px 16px 24px;
+  }
+
+  .upload.open {
+    display: block;
+  }
+
+  .upload-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  /* ---------- "Add hidden place" modal: full-screen, andar scroll ---------- */
+  .modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .modal {
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .mini-map {
+    height: 260px;
+  }
+
+  .mini-map .leaflet-control-zoom a {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    font-size: 22px;
+  }
+
+  /* ---------- Floating buttons (neeche right) ---------- */
+  .fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 14px;
+    z-index: 700;
+    width: 56px;
+    height: 56px;
+    border: none;
+    border-radius: 50%;
+    background: var(--terracotta);
+    color: #fff;
+    font-size: 30px;
+    line-height: 1;
+    box-shadow: 0 6px 16px rgba(74, 44, 26, 0.35);
+  }
+
+  .fab-add {
+    bottom: 16px;
+  }
+
+  .fab-upload {
+    bottom: 84px;
+    background: #fff;
+    color: var(--terracotta);
+    font-size: 24px;
+  }
+
+  /* ---------- Saare tap targets kam se kam 44px ---------- */
+  .btn,
+  .btn.small,
+  .tab,
+  .icon-btn {
+    min-height: 44px;
+  }
+
+  .btn.small {
+    padding: 0 14px;
+  }
+
+  .icon-btn {
+    min-width: 44px;
+  }
+
+  /* Input mein 16px font: iPhone par zoom na ho */
+  .input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  textarea.input {
+    min-height: 88px;
+  }
+
+  .check-row {
+    min-height: 44px;
+  }
+
+  .check-row input[type='checkbox'] {
+    width: 24px;
+    height: 24px;
+  }
+
+  .file-field input[type='file'] {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .file-field input[type='file']::file-selector-button,
+  .dropzone input[type='file']::file-selector-button {
+    min-height: 44px;
+    padding: 0 14px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .location-row,
+  .detail-body,
+  .modal,
+  .upload {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 }

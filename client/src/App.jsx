@@ -17,6 +17,9 @@ const DEFAULT_MAP_SIZE = { width: 60, height: 60 }
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
+// Chhoti (mobile) screen hai ya nahi: CSS ke 768px breakpoint se match karta hai
+const isMobileScreen = () => window.matchMedia('(max-width: 768px)').matches
+
 // Pichli baar ka map size yaad rakhte hain (agar browser allow kare)
 function readMapSize() {
   try {
@@ -50,6 +53,10 @@ export default function App() {
   // Header ka "Add a hidden heritage place" popup, aur success par "Thank you!" message
   const [addOpen, setAddOpen] = useState(false)
   const [thanks, setThanks] = useState(false)
+
+  // Mobile par upload panel full-screen khulta hai (floating 📷 button se)
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const pickFromUpload = useRef(false) // map par location upload panel ke liye chuni ja rahi hai
 
   // Thank you message 3 second baad apne aap gayab
   useEffect(() => {
@@ -151,7 +158,13 @@ export default function App() {
 
   function focusPlace(place) {
     setSelected(place)
-    setFlyTarget({ lat: place.lat, lng: place.lng, zoom: 13 })
+    // Mobile par bottom sheet neeche ka hissa dhak leti hai, isliye pin ko upar rakhne ke liye inset
+    setFlyTarget({
+      lat: place.lat,
+      lng: place.lng,
+      zoom: 13,
+      inset: isMobileScreen() ? window.innerHeight * 0.45 : 0,
+    })
   }
 
   function handleUpdated(updated) {
@@ -168,6 +181,7 @@ export default function App() {
     )
     focusPlace(place)
     refreshStats()
+    setUploadOpen(false) // mobile: upload ke baad full-screen panel band, map par pin dikhe
   }
 
   function chooseTrail(id) {
@@ -193,6 +207,11 @@ export default function App() {
   function handleMapPick(loc) {
     setLocation(loc)
     setPickMode(false)
+    // Mobile: upload panel ke liye location chuni thi to wo panel wapas khol do
+    if (pickFromUpload.current) {
+      pickFromUpload.current = false
+      setUploadOpen(true)
+    }
   }
 
   // Header ke button se popup form khulta hai
@@ -211,6 +230,7 @@ export default function App() {
 
   // Modal se map par location chunne ka mode on karo
   function pickOnMapForPlace() {
+    pickFromUpload.current = false
     setPickMode(true)
     document.querySelector('.map-area')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -223,7 +243,9 @@ export default function App() {
   }
 
   function togglePick() {
+    pickFromUpload.current = true
     setPickMode((on) => !on)
+    setUploadOpen(false) // mobile: map dikhne ke liye full-screen panel abhi band
     // Mobile par map upar hai, isliye chunne ke waqt map tak scroll karo
     document.querySelector('.map-area')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -287,7 +309,8 @@ export default function App() {
           )}
           <MapView
             places={filtered}
-            onSelect={setSelected}
+            onSelect={(place) => (isMobileScreen() ? focusPlace(place) : setSelected(place))}
+            sheetOpen={Boolean(selected) || uploadOpen}
             flyTarget={flyTarget}
             pickMode={pickMode}
             onPick={handleMapPick}
@@ -307,34 +330,37 @@ export default function App() {
         />
 
         <aside className="sidebar">
-          <SearchBar
-            query={query}
-            onQueryChange={setQuery}
-            typeFilter={typeFilter}
-            onTypeChange={setTypeFilter}
-            results={filtered.slice(0, 6)}
-            onResultClick={focusPlace}
-          />
+          {/* Mobile par ye teeno map ke upar ek compact stack mein aate hain */}
+          <div className="top-stack">
+            <SearchBar
+              query={query}
+              onQueryChange={setQuery}
+              typeFilter={typeFilter}
+              onTypeChange={setTypeFilter}
+              results={filtered.slice(0, 6)}
+              onResultClick={focusPlace}
+            />
 
-          <TrailsPanel
-            trails={TRAILS}
-            activeId={activeTrailId}
-            stopIndex={stopIndex}
-            stopCount={trailStops?.length ?? 0}
-            onChoose={chooseTrail}
-            onPrev={() => goToStop(stopIndex - 1)}
-            onNext={() => goToStop((stopIndex ?? -1) + 1)}
-            onExit={exitTrail}
-          />
+            <TrailsPanel
+              trails={TRAILS}
+              activeId={activeTrailId}
+              stopIndex={stopIndex}
+              stopCount={trailStops?.length ?? 0}
+              onChoose={chooseTrail}
+              onPrev={() => goToStop(stopIndex - 1)}
+              onNext={() => goToStop((stopIndex ?? -1) + 1)}
+              onExit={exitTrail}
+            />
 
-          {loadError && (
-            <div className="banner error-banner">
-              <p>{t('backendDown')}</p>
-              <button className="btn ghost small" onClick={() => window.location.reload()}>
-                {t('tryAgain')}
-              </button>
-            </div>
-          )}
+            {loadError && (
+              <div className="banner error-banner">
+                <p>{t('backendDown')}</p>
+                <button className="btn ghost small" onClick={() => window.location.reload()}>
+                  {t('tryAgain')}
+                </button>
+              </div>
+            )}
+          </div>
 
           {selected && (
             <PlaceDetail
@@ -351,9 +377,19 @@ export default function App() {
             pickMode={pickMode}
             onTogglePick={togglePick}
             onNewPlace={handleNewPlace}
+            mobileOpen={uploadOpen}
+            onMobileClose={() => setUploadOpen(false)}
           />
         </aside>
       </div>
+
+      {/* Mobile ke floating buttons (desktop par CSS se chhupe rehte hain) */}
+      <button className="fab fab-upload" onClick={() => setUploadOpen(true)} aria-label={t('uploadTitle')}>
+        📷
+      </button>
+      <button className="fab fab-add" onClick={openAddPlace} aria-label={t('addPlaceTitle')}>
+        +
+      </button>
     </div>
   )
 }

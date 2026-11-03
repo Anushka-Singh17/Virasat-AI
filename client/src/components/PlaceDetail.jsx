@@ -17,6 +17,7 @@ function Section({ title, text }) {
 export default function PlaceDetail({ place, onClose, onUpdated }) {
   const { t, lang } = useLanguage()
   const [editing, setEditing] = useState(false)
+  const [sheetVh, setSheetVh] = useState(45) // mobile bottom sheet ki height (screen ka %)
   const [speaking, setSpeaking] = useState(false)
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
   const [naam, setNaam] = useState('')
@@ -53,6 +54,26 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
     utterance.onerror = () => setSpeaking(false)
     window.speechSynthesis.speak(utterance)
     setSpeaking(true)
+  }
+
+  // Mobile: handle ko upar-neeche khinchne se sheet badi/chhoti hoti hai. Bahut neeche chhodo to band.
+  function startSheetDrag(e) {
+    e.preventDefault()
+    let latest = sheetVh
+
+    function onMove(ev) {
+      latest = Math.min(90, Math.max(15, ((window.innerHeight - ev.clientY) / window.innerHeight) * 100))
+      setSheetVh(latest)
+    }
+
+    function onUp() {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      if (latest < 22) onClose()
+    }
+
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
   }
 
   async function handlePhoto(e) {
@@ -95,7 +116,9 @@ export default function PlaceDetail({ place, onClose, onUpdated }) {
   }
 
   return (
-    <article className="card detail">
+    <article className="card detail" style={{ '--sheet-h': `${sheetVh}vh` }}>
+      {/* Sirf mobile par dikhta hai: sheet ko khinchne ka handle */}
+      <div className="sheet-handle" onPointerDown={startSheetDrag} />
       <button className="icon-btn close" onClick={onClose} aria-label={t('close')}>
         ×
       </button>

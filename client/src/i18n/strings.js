@@ -1,6 +1,30 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  takePhoto: {
+    en: '📷 Take photo',
+    hi: '📷 फ़ोटो खींचें',
+    bn: '📷 ছবি তুলুন',
+    ta: '📷 புகைப்படம் எடுக்கவும்',
+  },
+  chooseGallery: {
+    en: '🖼️ Choose from gallery',
+    hi: '🖼️ गैलरी से चुनें',
+    bn: '🖼️ গ্যালারি থেকে বাছাই করুন',
+    ta: '🖼️ கேலரியிலிருந்து தேர்ந்தெடுக்கவும்',
+  },
+  choosePhotoBtn: {
+    en: '🖼️ Choose photo',
+    hi: '🖼️ फ़ोटो चुनें',
+    bn: '🖼️ ছবি বাছাই করুন',
+    ta: '🖼️ புகைப்படத்தைத் தேர்ந்தெடுக்கவும்',
+  },
+  hereNowQ: {
+    en: '📍 Are you at this place right now?',
+    hi: '📍 क्या आप अभी इसी जगह पर हैं?',
+    bn: '📍 আপনি কি এখন এই জায়গায় আছেন?',
+    ta: '📍 நீங்கள் இப்போது இந்த இடத்தில் இருக்கிறீர்களா?',
+  },
   miniMapLegend: {
     en: '🟡 Needs info · 🟢 Known · 🔴 Your new place',
     hi: '🟡 जानकारी चाहिए · 🟢 जानी-पहचानी · 🔴 आपकी नई जगह',

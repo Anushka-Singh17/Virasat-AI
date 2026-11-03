@@ -27,7 +27,15 @@ function ResultCard({ data }) {
   )
 }
 
-export default function UploadPanel({ location, onLocationFound, pickMode, onTogglePick, onNewPlace }) {
+export default function UploadPanel({
+  location,
+  onLocationFound,
+  pickMode,
+  onTogglePick,
+  onNewPlace,
+  mobileOpen,
+  onMobileClose,
+}) {
   const { t } = useLanguage()
   const [mode, setMode] = useState('place')
   const [file, setFile] = useState(null)
@@ -38,6 +46,14 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
   const [result, setResult] = useState(null)
   // Request chalte waqt dobara submit na ho (button disabled hone se pehle ka gap bhi band)
   const submittingRef = useRef(false)
+
+  // Do alag file inputs: camera (seedha back camera) aur gallery. Dono button se trigger hote hain.
+  const cameraRef = useRef(null)
+  const galleryRef = useRef(null)
+  // "Take photo" sirf touch device (phone/tablet) par. Desktop par camera ka matlab nahi, wahan sirf "Choose photo".
+  const [canTakePhoto] = useState(() => window.matchMedia('(pointer: coarse)').matches)
+  // Camera se photo aayi aur usme GPS nahi tha: "Are you at this place right now?" poochna hai
+  const [cameraNoGps, setCameraNoGps] = useState(false)
 
   // Gemini ne jagah nahi batayi aur user ki location bhi nahi hai: user se poochna hai
   const needsLocation = result !== null && !hasCoords(result.place) && !location
@@ -50,12 +66,15 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  async function handleFile(e) {
+  // source: "camera" (Take photo) ya "gallery" (Choose photo)
+  async function handleFile(e, source) {
     const chosen = e.target.files?.[0]
+    e.target.value = '' // wahi photo dobara chunne par bhi change event aaye
     if (!chosen) return
     setFile(chosen)
     setResult(null)
     setError('')
+    setCameraNoGps(false)
     setGpsNote(t('readingGps'))
 
     try {
@@ -65,9 +84,11 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
         setGpsNote(t('gpsFound'))
       } else {
         setGpsNote(t('noGps'))
+        if (source === 'camera') setCameraNoGps(true)
       }
     } catch {
       setGpsNote(t('gpsError'))
+      if (source === 'camera') setCameraNoGps(true)
     }
   }
 
@@ -105,13 +126,21 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
       return
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => onLocationFound({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (pos) => {
+        // Backend ise "user" location maanta hai (locationSource: "user")
+        onLocationFound({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setGpsNote(t('confirmedNote'))
+      },
       () => setError(t('locationDenied')),
     )
   }
 
   return (
-    <section className="card upload">
+    <section className={`card upload ${mobileOpen ? 'open' : ''}`}>
+      {/* Sirf mobile par dikhta hai: full-screen panel band karne ke liye */}
+      <button type="button" className="icon-btn upload-close" onClick={onMobileClose} aria-label={t('close')}>
+        ×
+      </button>
       <h3>{t('uploadTitle')}</h3>
 
       <div className="tabs" role="tablist">
@@ -130,13 +159,41 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
       </div>
 
       <label className="dropzone">
-        <input type="file" accept="image/*" onChange={handleFile} />
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFile(e, 'gallery')}
+        />
         {preview ? (
           <img src={preview} alt={t('previewAlt')} />
         ) : (
           <span>📷 {t('choosePhoto')}</span>
         )}
       </label>
+
+      {/* Camera input: capture="environment" se seedha back camera khulta hai (sirf touch devices par) */}
+      {canTakePhoto && (
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={(e) => handleFile(e, 'camera')}
+        />
+      )}
+
+      <div className="row photo-buttons">
+        {canTakePhoto && (
+          <button type="button" className="btn ghost" onClick={() => cameraRef.current?.click()}>
+            {t('takePhoto')}
+          </button>
+        )}
+        <button type="button" className="btn ghost" onClick={() => galleryRef.current?.click()}>
+          {canTakePhoto ? t('chooseGallery') : t('choosePhotoBtn')}
+        </button>
+      </div>
 
       {file && (
         <>
@@ -155,6 +212,18 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
             </button>
           </div>
         </>
+      )}
+
+      {/* Camera se photo aayi par GPS nahi mila: kya user abhi isi jagah par hai? */}
+      {cameraNoGps && !location && (
+        <div className="location-ask">
+          <p>{t('hereNowQ')}</p>
+          <div className="row">
+            <button type="button" className="btn ghost small" onClick={handleUseCurrentLocation}>
+              {t('useCurrentLocation')}
+            </button>
+          </div>
+        </div>
       )}
 
       <button className="btn primary full" disabled={!file || loading} onClick={handleSubmit}>

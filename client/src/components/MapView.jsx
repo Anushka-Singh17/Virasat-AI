@@ -29,8 +29,32 @@ const WORLD_RING = [
 function FlyTo({ target }) {
   const map = useMap()
   useEffect(() => {
-    if (target) map.flyTo([target.lat, target.lng], target.zoom ?? 13, { duration: 1.2 })
+    if (!target) return
+    const zoom = target.zoom ?? 13
+    let center = [target.lat, target.lng]
+    // Mobile: upar search/trails aur neeche bottom sheet map dhakte hain.
+    // Pin ko in dono ke beech ki khuli patti ke beech mein laane ke liye center shift karo.
+    if (target.inset) {
+      const box = map.getContainer().getBoundingClientRect()
+      const stackBottom = document.querySelector('.top-stack')?.getBoundingClientRect().bottom ?? box.top
+      const sheetTop = window.innerHeight - target.inset
+      const desiredY = (Math.max(stackBottom, box.top) + sheetTop) / 2
+      const shift = box.top + box.height / 2 - desiredY
+      const shifted = map.unproject(map.project(center, zoom).add([0, shift]), zoom)
+      center = [shifted.lat, shifted.lng]
+    }
+    map.flyTo(center, zoom, { duration: 1.2 })
   }, [target, map])
+  return null
+}
+
+// Sheet ya full-screen panel khulne/band hone ke baad map ko apna size dobara naapne do
+function SheetResizeSync({ open }) {
+  const map = useMap()
+  useEffect(() => {
+    const timer = setTimeout(() => map.invalidateSize(), 300)
+    return () => clearTimeout(timer)
+  }, [open, map])
   return null
 }
 
@@ -98,6 +122,7 @@ export default function MapView({
   onToggleFullscreen,
   trailStops,
   onLocationDrag,
+  sheetOpen,
 }) {
   const { t } = useLanguage()
   const [india, setIndia] = useState(null)
@@ -178,6 +203,7 @@ export default function MapView({
         <FlyTo target={flyTarget} />
         <LocationPicker enabled={pickMode} onPick={onPick} />
         <InvalidateOnResize />
+        <SheetResizeSync open={sheetOpen} />
 
         {places.map((p) => (
           <Marker
