@@ -34,6 +34,9 @@ const placeSchema = new mongoose.Schema(
     // Location kahan se li gayi: exif (photo ka GPS), ai (Gemini), ya user (map par chuna)
     locationSource: { type: String, enum: ["exif", "ai", "user"] },
 
+    // User ko sirf lagbhag ka ilaaka pata hai, exact jagah nahi
+    locationApprox: { type: Boolean, default: false },
+
     // User ne jo likha
     userKahani: { type: String, default: "" },
     contributorName: { type: String, default: "" },

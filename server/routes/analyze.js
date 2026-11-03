@@ -20,6 +20,71 @@ function getAi() {
   return ai;
 }
 
+// Model ka naam .env se: GEMINI_MODEL (primary) aur GEMINI_FALLBACK_MODEL (backup, optional)
+const DEFAULT_MODEL = "gemini-flash-latest";
+
+const CALL_TIMEOUT_MS = 15000; // har Gemini call par max 15 second
+const TOTAL_BUDGET_MS = 35000; // poori request ka max time (~35 second)
+const RETRY_DELAY_MS = 1000; // retry se pehle 1 second ruko
+const SLOW_FAIL_MS = 5000; // isse zyada atak kar fail ho to same model par retry nahi, seedha fallback
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Gemini ke error se HTTP code nikalo (SDK error mein .status hota hai, warna message ke JSON se)
+function getStatusCode(err) {
+  if (Number.isInteger(err?.status)) return err.status;
+  const match = String(err?.message || "").match(/"code"\s*:\s*(\d{3})/);
+  return match ? Number(match[1]) : null;
+}
+
+// Busy (503), limit (429) ya timeout: in teeno par retry / fallback karte hain
+function isBusyError(err) {
+  const code = getStatusCode(err);
+  return code === 503 || code === 429 || err?.name === "TimeoutError" || err?.name === "AbortError";
+}
+
+// Pehle primary model (1 call + 1 retry), phir fallback model (1 call + 1 retry).
+// Har call par 15 second timeout, aur poori request deadline se pehle khatam.
+async function generateWithFallback(client, { contents, config }, clientSignal, deadline) {
+  const models = [process.env.GEMINI_MODEL || DEFAULT_MODEL];
+  if (process.env.GEMINI_FALLBACK_MODEL) models.push(process.env.GEMINI_FALLBACK_MODEL);
+
+  let lastErr = null;
+  for (const model of models) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const remaining = deadline - Date.now();
+      if (remaining < 1500) throw lastErr ?? new Error("Time budget khatam");
+
+      // Client chala jaaye ya 15 second (ya bacha hua time) ho jaaye to call band
+      const signal = AbortSignal.any([clientSignal, AbortSignal.timeout(Math.min(CALL_TIMEOUT_MS, remaining))]);
+      const callStart = Date.now();
+      try {
+        const response = await client.models.generateContent({
+          model,
+          contents,
+          config: { ...config, abortSignal: signal },
+        });
+        console.log(`Gemini ne jawab diya: model ${model} (attempt ${attempt}/2)`);
+        return response;
+      } catch (err) {
+        if (clientSignal.aborted) throw err; // user chala gaya, aage kuch nahi karna
+        lastErr = err;
+        if (!isBusyError(err)) throw err; // 404, 400 jaise error par retry/fallback nahi
+        console.log(`Gemini [${model}] ${getStatusCode(err) ?? "timeout"}: attempt ${attempt}/2 fail`);
+        if (attempt === 1) {
+          // Pehla fail tez tha (jaise turant 503) to 1 retry. Atak kar fail hua to retry mein time waste, seedha agla model.
+          if (Date.now() - callStart > SLOW_FAIL_MS) {
+            console.log(`Gemini [${model}] atak kar fail hua, retry nahi`);
+            break;
+          }
+          await wait(RETRY_DELAY_MS);
+        }
+      }
+    }
+    console.log(`Gemini [${model}] fail${model === models[models.length - 1] ? "" : ", ab fallback model"}`);
+  }
+  throw lastErr;
+}
+
 // Gemini ko ye JSON format dene ko kehte hain. Pakka na pata ho to "unknown" likhne ka rule hai.
 const PROMPT = `
 Tum ek Indian heritage expert ho. Di gayi image dekh kar sirf JSON return karo, koi aur text nahi.
@@ -109,6 +174,19 @@ async function findNearby(lat, lng) {
 
 // POST /api/analyze -> multipart: image (file), mode, lat, lng (optional)
 router.post("/", (req, res) => {
+  // Har request ka total time (ms) console mein, chahe success ho ya error
+  const startedAt = Date.now();
+
+  // Client beech mein chala jaaye (refresh, tab band) to Gemini call bhi band, bekaar kaam nahi
+  const clientGone = new AbortController();
+  res.on("close", () => {
+    const finished = res.writableFinished;
+    if (!finished) clientGone.abort();
+    console.log(
+      `Analyze request: ${Date.now() - startedAt} ms (${finished ? `status ${res.statusCode}` : "client chala gaya"})`
+    );
+  });
+
   upload.single("image")(req, res, async (uploadErr) => {
     if (uploadErr) {
       return res.status(400).json({ error: "Photo upload nahi ho paayi (max 8MB, sirf image)" });
@@ -135,8 +213,7 @@ router.post("/", (req, res) => {
         return res.status(500).json({ error: "GEMINI_API_KEY server mein set nahi hai" });
       }
 
-      const response = await client.models.generateContent({
-        model: "gemini-3.8-flash",
+      const response = await generateWithFallback(client, {
         contents: [
           {
             role: "user",
@@ -152,7 +229,7 @@ router.post("/", (req, res) => {
           },
         ],
         config: { responseMimeType: "application/json" },
-      });
+      }, clientGone.signal, startedAt + TOTAL_BUDGET_MS);
 
       const info = parseGeminiJson(response.text) || { identified: false };
       const identified = info.identified === true && info.naam && info.naam !== "unknown";
@@ -191,7 +268,19 @@ router.post("/", (req, res) => {
       // Jagah nahi pata: save nahi karte, frontend user se location poochega
       return res.json({ place: { ...fields, lat: null, lng: null }, source });
     } catch (err) {
-      console.log("Analyze error ❌", err.message);
+      // User khud chala gaya: koi response nahi bhejna
+      if (clientGone.signal.aborted) return;
+
+      const code = getStatusCode(err);
+      console.log("Analyze error ❌", code ?? err?.name ?? "", String(err.message).slice(0, 200));
+
+      // Model ka naam galat hai
+      if (code === 404) console.log("Gemini model name galat hai, .env check karo");
+
+      // Sab models/retries fail (busy, limit ya timeout): user ko saaf message
+      if (isBusyError(err)) {
+        return res.status(503).json({ error: "AI is busy right now, please try again in a minute." });
+      }
       return res.status(502).json({ error: "AI check nahi kar paya, baad mein try karein" });
     }
   });

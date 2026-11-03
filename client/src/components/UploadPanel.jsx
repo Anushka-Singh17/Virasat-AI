@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import exifr from 'exifr'
 import { analyzeImage } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -36,6 +36,8 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
+  // Request chalte waqt dobara submit na ho (button disabled hone se pehle ka gap bhi band)
+  const submittingRef = useRef(false)
 
   // Gemini ne jagah nahi batayi aur user ki location bhi nahi hai: user se poochna hai
   const needsLocation = result !== null && !hasCoords(result.place) && !location
@@ -71,7 +73,8 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
 
   // Location optional hai: bina location ke bhi Identify chalta hai
   async function handleSubmit() {
-    if (!file) return
+    if (!file || submittingRef.current) return
+    submittingRef.current = true
 
     setLoading(true)
     setError('')
@@ -91,6 +94,7 @@ export default function UploadPanel({ location, onLocationFound, pickMode, onTog
     } catch {
       setError(t('aiError'))
     } finally {
+      submittingRef.current = false
       setLoading(false)
     }
   }
