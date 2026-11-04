@@ -1,19 +1,53 @@
-/* Heritage theme: sandstone, terracotta, cream */
+/* =====================================================================
+   Design system: Welcome page aur Map page DONO yahi variables use karte hain.
+   Rang, font, radius, shadow, button style badalna ho to sirf yahan badlo.
+   ===================================================================== */
 :root {
+  /* Rang (sandstone, terracotta, cream) */
   --cream: #fbf5ea;
   --sand: #e8c9a0;
   --sand-dark: #c9a06b;
   --terracotta: #b5532e;
   --terracotta-dark: #8f3e20;
   --brown: #4a2c1a;
+  --brown-soft: #6b4a35; /* tagline / description ka halka text */
   --muted: #8a7261;
   --card: #ffffff;
+  --glass: rgba(255, 255, 255, 0.82);
   --green: #2e7d4f;
   --yellow: #e0a800;
   --red: #b3261e;
-  --shadow: 0 6px 18px rgba(74, 44, 26, 0.12);
-  --radius: 14px;
 
+  /* Background: sandstone se terracotta ki halki gradient + header ki gradient */
+  --bg-gradient: linear-gradient(165deg, #fbf5ea 0%, #f1dbb8 45%, #dfb582 100%);
+  --header-gradient: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+
+  /* Halka jaali (diamond) pattern: apna banaya SVG, koi copyrighted image nahi */
+  --pattern-jaali: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23b5532e' stroke-opacity='0.13' stroke-width='1.2'%3E%3Cpath d='M32 4 60 32 32 60 4 32Z'/%3E%3Cpath d='M32 17 47 32 32 47 17 32Z'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23b5532e' fill-opacity='0.15'/%3E%3C/svg%3E");
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-sm: 0 2px 8px rgba(74, 44, 26, 0.1);
+  --shadow: 0 6px 18px rgba(74, 44, 26, 0.12);
+  --shadow-lg: 0 18px 40px rgba(74, 44, 26, 0.16);
+
+  /* Buttons: primary (terracotta) aur ghost (halka border) */
+  --btn-primary-bg: var(--terracotta);
+  --btn-primary-bg-hover: var(--terracotta-dark);
+  --btn-primary-shadow: 0 8px 18px rgba(181, 83, 46, 0.3);
+  --btn-primary-shadow-hover: 0 14px 28px rgba(181, 83, 46, 0.4);
+  --btn-ghost-border: var(--sand-dark);
+  --btn-ghost-bg: rgba(255, 255, 255, 0.7);
+
+  /* Halki smooth animation (hover, tab switch) */
+  --transition: 0.2s ease;
+
+  /* Fonts */
   --heading: 'Playfair Display', Georgia, serif;
   --sans: 'Inter', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Tamil', system-ui,
     -apple-system, 'Segoe UI', Roboto, sans-serif;

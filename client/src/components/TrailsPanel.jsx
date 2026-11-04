@@ -1,7 +1,28 @@
 import { useLanguage } from '../i18n/LanguageContext'
 
+// Ek section: heading + trails ki list (har item par click se trail shuru)
+function TrailSection({ titleKey, trails, onChoose, t }) {
+  if (trails.length === 0) return null
+  return (
+    <div className="trail-section">
+      <h4 className="trail-section-title">{t(titleKey)}</h4>
+      <ul className="trail-list">
+        {trails.map((trail) => (
+          <li key={trail.id}>
+            <button className="trail-item" onClick={() => onChoose(trail.id)}>
+              <span>{trail.title}</span>
+              <small>{t('stopsCount', { n: trail.stops.length })}</small>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function TrailsPanel({
-  trails,
+  featured,
+  regions,
   activeId,
   stopIndex,
   stopCount,
@@ -11,28 +32,22 @@ export default function TrailsPanel({
   onExit,
 }) {
   const { t } = useLanguage()
+  const trail = [...featured, ...regions].find((tr) => tr.id === activeId)
 
-  // Koi trail chuni nahi hai: trails ki list dikhao
-  if (!activeId) {
+  // Koi trail chuni nahi hai (ya chuni hui trail ab list mein nahi): do sections dikhao
+  if (!trail) {
     return (
       <section className="card trails">
         <h3>{t('trailsTitle')}</h3>
-        <ul className="trail-list">
-          {trails.map((trail) => (
-            <li key={trail.id}>
-              <button className="trail-item" onClick={() => onChoose(trail.id)}>
-                <span>{trail.title}</span>
-                <small>{t('stopsCount', { n: trail.stops.length })}</small>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="trail-sections">
+          <TrailSection titleKey="trailsFeatured" trails={featured} onChoose={onChoose} t={t} />
+          <TrailSection titleKey="trailsByRegion" trails={regions} onChoose={onChoose} t={t} />
+        </div>
       </section>
     )
   }
 
   // Trail chal rahi hai: stop ka counter aur Prev / Next / Exit
-  const trail = trails.find((tr) => tr.id === activeId)
   return (
     <section className="card trails">
       <h3>{trail.title}</h3>

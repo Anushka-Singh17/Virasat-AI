@@ -1,0 +1,342 @@
+/* Welcome page + onboarding slides.
+   Rang, radius, shadow, button style sab index.css ke design system (:root) se aate hain.
+   Saari classes "welcome-" ya "intro-" se shuru hoti hain, taaki map app ke CSS se na takraayein. */
+
+.welcome {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px 120px;
+  overflow: hidden;
+  background: var(--bg-gradient);
+}
+
+/* Halka jaali pattern */
+.welcome::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--pattern-jaali);
+  background-size: 64px 64px;
+  pointer-events: none;
+}
+
+/* Neeche mehrab (arch) wala illustration */
+.welcome-art {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  /* 46vh: kam oonchi screen par illustration button ke upar na chadhe */
+  width: min(520px, 92vw, 46vh);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 720px;
+  text-align: center;
+  animation: welcome-fade-up 0.7s ease both;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: var(--heading);
+  font-size: clamp(52px, 12vw, 104px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--brown);
+  letter-spacing: -1px;
+}
+
+/* Heading ke neeche chhota sajawati (ornament) divider */
+.welcome-title::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 4px;
+  margin: 14px auto 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--terracotta), var(--yellow));
+}
+
+.welcome-tagline {
+  margin: 0;
+  font-size: clamp(17px, 2.6vw, 24px);
+  line-height: 1.4;
+  color: var(--brown-soft);
+}
+
+.welcome-cta {
+  margin-top: 10px;
+  min-height: 56px;
+  padding: 0 34px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--btn-primary-bg);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--btn-primary-shadow);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    background var(--transition);
+}
+
+.welcome-cta:hover {
+  background: var(--btn-primary-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-primary-shadow-hover);
+}
+
+.welcome-cta:active {
+  transform: translateY(0);
+}
+
+/* "How it works": CTA ke neeche chhota link */
+.welcome-link {
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  color: var(--brown-soft);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.welcome-link:hover {
+  color: var(--terracotta);
+}
+
+/* ---------- Onboarding slides ---------- */
+.intro-skip {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--brown);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.intro-skip:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.intro-stage {
+  position: relative;
+  z-index: 1;
+  width: min(480px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  touch-action: pan-y; /* upar-neeche scroll chalega, left-right swipe hum sambhalenge */
+}
+
+.intro-card {
+  padding: 36px 26px 32px;
+  border-radius: var(--radius-lg);
+  background: var(--glass);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: intro-slide-next 0.38s ease both;
+}
+
+.intro-card[data-direction='back'] {
+  animation-name: intro-slide-back;
+}
+
+.intro-badge {
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f6dfba, var(--sand));
+  font-size: 54px;
+  box-shadow: inset 0 -6px 14px rgba(181, 83, 46, 0.18);
+}
+
+.intro-card h2 {
+  margin: 0 0 10px;
+  font-family: var(--heading);
+  font-size: 32px;
+  color: var(--brown);
+}
+
+.intro-card p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--brown-soft);
+}
+
+.intro-dots {
+  display: flex;
+  justify-content: center;
+}
+
+/* Dot ka tap area 44px, dikhne wala dot chhota */
+.intro-dot {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.intro-dot::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 6px;
+  background: var(--sand-dark);
+  transition:
+    width 0.25s ease,
+    background 0.25s ease;
+}
+
+.intro-dot.active::after {
+  width: 28px;
+  background: var(--terracotta);
+}
+
+.intro-nav {
+  display: flex;
+  gap: 12px;
+}
+
+.intro-btn {
+  flex: 1;
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: var(--radius);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.intro-btn:active {
+  transform: scale(0.98);
+}
+
+.intro-btn.primary {
+  border: none;
+  background: var(--btn-primary-bg);
+  color: #fff;
+  box-shadow: var(--btn-primary-shadow);
+}
+
+.intro-btn.primary:hover {
+  background: var(--btn-primary-bg-hover);
+}
+
+.intro-btn.ghost {
+  border: 1.5px solid var(--btn-ghost-border);
+  background: var(--btn-ghost-bg);
+  color: var(--brown);
+}
+
+.intro-btn.ghost:hover {
+  background: #fff;
+}
+
+/* ---------- Halki animations ---------- */
+@keyframes welcome-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes intro-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(44px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes intro-slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-44px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Jinhe animation pasand nahi (system setting), unke liye band */
+@media (prefers-reduced-motion: reduce) {
+  .welcome-content,
+  .intro-card {
+    animation: none;
+  }
+
+  .welcome-cta,
+  .intro-btn,
+  .intro-dot::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome {
+    padding-bottom: 96px;
+  }
+
+  .intro-card {
+    padding: 30px 20px 26px;
+  }
+
+  .intro-card h2 {
+    font-size: 28px;
+  }
+
+  .intro-card p {
+    font-size: 17px;
+  }
+}

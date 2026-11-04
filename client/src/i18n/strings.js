@@ -1,6 +1,114 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  trailsFeatured: {
+    en: '⭐ Featured trails',
+    hi: '⭐ खास ट्रेल्स',
+    bn: '⭐ বিশেষ ট্রেইল',
+    ta: '⭐ சிறப்புப் பாதைகள்',
+  },
+  trailsByRegion: {
+    en: '🗺️ Explore by region',
+    hi: '🗺️ क्षेत्र के अनुसार खोजें',
+    bn: '🗺️ অঞ্চল অনুযায়ী অন্বেষণ করুন',
+    ta: '🗺️ பகுதி வாரியாக ஆராயுங்கள்',
+  },
+  howItWorks: {
+    en: 'How it works',
+    hi: 'यह कैसे काम करता है',
+    bn: 'এটি কীভাবে কাজ করে',
+    ta: 'இது எப்படி வேலை செய்கிறது',
+  },
+  tabExplore: {
+    en: '🔍 Explore',
+    hi: '🔍 खोजें',
+    bn: '🔍 অন্বেষণ',
+    ta: '🔍 ஆராய்',
+  },
+  tabTrails: {
+    en: '🛤️ Trails',
+    hi: '🛤️ ट्रेल्स',
+    bn: '🛤️ ট্রেইল',
+    ta: '🛤️ பாதைகள்',
+  },
+  tabIdentify: {
+    en: '📸 Identify',
+    hi: '📸 पहचानें',
+    bn: '📸 শনাক্ত',
+    ta: '📸 அடையாளம்',
+  },
+  legendKnown: {
+    en: 'Known',
+    hi: 'जानी-पहचानी',
+    bn: 'পরিচিত',
+    ta: 'அறியப்பட்டது',
+  },
+  exploreMapBtn: {
+    en: 'Explore the map →',
+    hi: 'नक्शा देखें →',
+    bn: 'মানচিত্র দেখুন →',
+    ta: 'வரைபடத்தை ஆராயுங்கள் →',
+  },
+  introExploreTitle: {
+    en: 'Explore',
+    hi: 'खोजें',
+    bn: 'অন্বেষণ করুন',
+    ta: 'ஆராயுங்கள்',
+  },
+  introExploreText: {
+    en: 'Discover heritage sites across India on an interactive map',
+    hi: 'इंटरैक्टिव नक्शे पर पूरे भारत की धरोहरें खोजें',
+    bn: 'একটি ইন্টারঅ্যাক্টিভ মানচিত্রে ভারত জুড়ে ঐতিহ্যস্থল খুঁজে নিন',
+    ta: 'ஊடாடும் வரைபடத்தில் இந்தியா முழுவதும் உள்ள பாரம்பரிய இடங்களைக் கண்டறியுங்கள்',
+  },
+  introIdentifyTitle: {
+    en: 'Identify',
+    hi: 'पहचानें',
+    bn: 'শনাক্ত করুন',
+    ta: 'அடையாளம் காணுங்கள்',
+  },
+  introIdentifyText: {
+    en: 'Upload a photo — AI tells you what it is',
+    hi: 'फ़ोटो अपलोड करें — AI बताएगा कि यह क्या है',
+    bn: 'একটি ছবি আপলোড করুন — AI বলে দেবে এটি কী',
+    ta: 'ஒரு புகைப்படத்தைப் பதிவேற்றுங்கள் — அது என்ன என்று AI சொல்லும்',
+  },
+  introContributeTitle: {
+    en: 'Contribute',
+    hi: 'योगदान दें',
+    bn: 'অবদান রাখুন',
+    ta: 'பங்களியுங்கள்',
+  },
+  introContributeText: {
+    en: 'Know a hidden place? Add its story',
+    hi: 'कोई छिपी जगह जानते हैं? उसकी कहानी जोड़ें',
+    bn: 'কোনো লুকানো জায়গা জানেন? তার গল্প যোগ করুন',
+    ta: 'மறைந்திருக்கும் இடம் தெரியுமா? அதன் கதையைச் சேர்க்கவும்',
+  },
+  introNext: {
+    en: 'Next',
+    hi: 'आगे',
+    bn: 'পরের',
+    ta: 'அடுத்து',
+  },
+  introBack: {
+    en: 'Back',
+    hi: 'पीछे',
+    bn: 'পিছনে',
+    ta: 'பின்',
+  },
+  introSkip: {
+    en: 'Skip',
+    hi: 'छोड़ें',
+    bn: 'এড়িয়ে যান',
+    ta: 'தவிர்',
+  },
+  introGetStarted: {
+    en: 'Get started',
+    hi: 'शुरू करें',
+    bn: 'শুরু করুন',
+    ta: 'தொடங்குங்கள்',
+  },
   dropHint: {
     en: 'Click or drag a photo here',
     hi: 'फ़ोटो यहाँ क्लिक करें या खींचकर छोड़ें',
@@ -345,11 +453,12 @@ export const strings = {
     bn: '🙋 আমি এই জায়গা চিনি — এর গল্প যোগ করুন',
     ta: '🙋 இந்த இடம் எனக்குத் தெரியும் — அதன் கதையைச் சேர்க்கவும்',
   },
+  // "+" icon ab Header mein alag styled circle hai, isliye yahan emoji nahi
   addPlaceBtn: {
-    en: '➕ Add a hidden heritage place',
-    hi: '➕ कोई छिपी हुई विरासत जोड़ें',
-    bn: '➕ একটি লুকানো ঐতিহ্য যোগ করুন',
-    ta: '➕ மறைந்திருக்கும் பாரம்பரியத்தைச் சேர்க்கவும்',
+    en: 'Add a hidden heritage place',
+    hi: 'कोई छिपी हुई विरासत जोड़ें',
+    bn: 'একটি লুকানো ঐতিহ্য যোগ করুন',
+    ta: 'மறைந்திருக்கும் பாரம்பரியத்தைச் சேர்க்கவும்',
   },
   builtInfoPlaceholder: {
     en: 'When it was built / by whom (optional)',
@@ -434,10 +543,10 @@ export const strings = {
 
   // Stats
   totalPlaces: {
-    en: 'Total places',
-    hi: 'कुल स्थान',
-    bn: 'মোট স্থান',
-    ta: 'மொத்த இடங்கள்',
+    en: 'Total',
+    hi: 'कुल',
+    bn: 'মোট',
+    ta: 'மொத்தம்',
   },
   verified: {
     en: 'Verified',
@@ -446,10 +555,10 @@ export const strings = {
     ta: 'சரிபார்க்கப்பட்டது',
   },
   unknown: {
-    en: 'Unknown',
-    hi: 'अज्ञात',
-    bn: 'অজানা',
-    ta: 'தெரியாதவை',
+    en: 'Needs info',
+    hi: 'जानकारी चाहिए',
+    bn: 'তথ্য দরকার',
+    ta: 'தகவல் தேவை',
   },
 
   // Search and filter

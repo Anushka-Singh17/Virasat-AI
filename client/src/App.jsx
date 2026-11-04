@@ -7,13 +7,14 @@ import PlaceDetail from './components/PlaceDetail'
 import UploadPanel from './components/UploadPanel'
 import AddPlaceModal from './components/AddPlaceModal'
 import TrailsPanel from './components/TrailsPanel'
-import { TRAILS } from './trails'
+import { buildTrails } from './trails'
 import { getPlaces, getStats, isMock } from './api'
 import { useLanguage } from './i18n/LanguageContext'
 import './App.css'
 
-const MAP_SIZE_KEY = 'heritage-map-size'
-const DEFAULT_MAP_SIZE = { width: 60, height: 60 }
+// v2: naya default (map 65%, sidebar 35%) sab par lage, purane save kiye hue size se na dabe
+const MAP_SIZE_KEY = 'heritage-map-size-v2'
+const DEFAULT_MAP_SIZE = { width: 65, height: 60 }
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -56,6 +57,9 @@ export default function App() {
 
   // Mobile par upload panel full-screen khulta hai (floating 📷 button se)
   const [uploadOpen, setUploadOpen] = useState(false)
+
+  // Desktop sidebar ke 3 tabs: explore (search), trails, identify (upload). Mobile par sab ek saath dikhte hain.
+  const [sideTab, setSideTab] = useState('explore')
   const pickFromUpload = useRef(false) // map par location upload panel ke liye chuni ja rahi hai
 
   // Thank you message 3 second baad apne aap gayab
@@ -128,12 +132,14 @@ export default function App() {
     })
   }, [places, query, typeFilter])
 
-  // Chuni hui trail ke stops, naam se places dhoondh kar (order same rakhte hain)
+  // Trails: Featured (curated) + Explore by region (places ke state se apne aap)
+  const trails = useMemo(() => buildTrails(places), [places])
+
+  // Chuni hui trail ke stops (order trail mein hi tay hai)
   const trailStops = useMemo(() => {
-    const trail = TRAILS.find((tr) => tr.id === activeTrailId)
-    if (!trail) return null
-    return trail.stops.map((name) => places.find((p) => p.naam === name)).filter(Boolean)
-  }, [activeTrailId, places])
+    const trail = [...trails.featured, ...trails.regions].find((tr) => tr.id === activeTrailId)
+    return trail ? trail.stops : null
+  }, [trails, activeTrailId])
 
   // Mock mode mein stats places se ginte hain
   const localStats = {
@@ -329,7 +335,26 @@ export default function App() {
           onPointerDown={startResize}
         />
 
-        <aside className="sidebar">
+        <aside className="sidebar" data-tab={sideTab}>
+          <div className="side-tabs" role="tablist">
+            {[
+              ['explore', 'tabExplore'],
+              ['trails', 'tabTrails'],
+              ['identify', 'tabIdentify'],
+            ].map(([id, labelKey]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={sideTab === id}
+                className={`side-tab ${sideTab === id ? 'active' : ''}`}
+                onClick={() => setSideTab(id)}
+              >
+                {t(labelKey)}
+              </button>
+            ))}
+          </div>
+
           {/* Mobile par ye teeno map ke upar ek compact stack mein aate hain */}
           <div className="top-stack">
             <SearchBar
@@ -342,7 +367,8 @@ export default function App() {
             />
 
             <TrailsPanel
-              trails={TRAILS}
+              featured={trails.featured}
+              regions={trails.regions}
               activeId={activeTrailId}
               stopIndex={stopIndex}
               stopCount={trailStops?.length ?? 0}

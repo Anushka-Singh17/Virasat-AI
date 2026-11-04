@@ -43,22 +43,31 @@ export default function StatsBar({ total, verified, unknown, updatedAt }) {
     <div className="stats-wrap">
       <div className="stats">
         <div className="stat">
+          <span className="stat-icon" aria-hidden="true">
+            📍
+          </span>
           <strong>
             <CountUp value={total} />
           </strong>
-          <span>{t('totalPlaces')}</span>
+          <span className="stat-label">{t('totalPlaces')}</span>
         </div>
         <div className="stat">
+          <span className="stat-icon" aria-hidden="true">
+            ✅
+          </span>
           <strong className="text-green">
             <CountUp value={verified} />
           </strong>
-          <span>{t('verified')}</span>
+          <span className="stat-label">{t('verified')}</span>
         </div>
         <div className="stat">
+          <span className="stat-icon" aria-hidden="true">
+            🟡
+          </span>
           <strong className="text-yellow">
             <CountUp value={unknown} />
           </strong>
-          <span>{t('unknown')}</span>
+          <span className="stat-label">{t('unknown')}</span>
         </div>
       </div>
       <p className="stats-updated">

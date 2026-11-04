@@ -232,13 +232,21 @@ export default function MapView({
         {trailStops && trailStops.length > 0 && <TrailLayer stops={trailStops} />}
       </MapContainer>
 
-      <button className="satellite-btn" onClick={() => setSatellite((on) => !on)}>
-        {satellite ? t('mapView') : t('satelliteView')}
-      </button>
+      {/* Desktop par satellite aur fullscreen ek saath top-right mein (zoom buttons se door) */}
+      <div className="map-actions">
+        <button className="satellite-btn" onClick={() => setSatellite((on) => !on)}>
+          {satellite ? t('mapView') : t('satelliteView')}
+        </button>
 
-      <button className="fullscreen-btn" onClick={onToggleFullscreen}>
-        ⛶ {fullscreen ? t('exitFullscreen') : t('fullscreen')}
-      </button>
+        <button className="fullscreen-btn" onClick={onToggleFullscreen}>
+          ⛶ {fullscreen ? t('exitFullscreen') : t('fullscreen')}
+        </button>
+      </div>
+
+      {/* Chhota legend, neeche-left kone mein */}
+      <div className="map-key">
+        🟢 {t('legendKnown')} · 🟡 {t('unknown')}
+      </div>
 
       {pickMode && <div className="pick-hint">{t('pickHint')}</div>}
     </div>

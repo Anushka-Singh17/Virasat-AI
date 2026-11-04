@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom'
 import { LANGUAGES, useLanguage } from '../i18n/LanguageContext'
+import Logo from './Logo'
 
 export default function Header({ isMock, onAddPlace }) {
   const { lang, setLang, t } = useLanguage()
@@ -6,11 +8,20 @@ export default function Header({ isMock, onAddPlace }) {
   return (
     <header className="header">
       <div>
-        <h1 className="brand">Heritage Map</h1>
+        <h1 className="brand">
+          {/* Logo par click: "/" (Welcome page) par jaao */}
+          <Link to="/" className="brand-link">
+            <Logo />
+            <span>Virasat AI</span>
+          </Link>
+        </h1>
         <p className="tagline">{t('tagline')}</p>
       </div>
       <div className="header-right">
         <button className="add-place-btn" onClick={onAddPlace}>
+          <span className="btn-plus" aria-hidden="true">
+            +
+          </span>
           {t('addPlaceBtn')}
         </button>
         {isMock && <span className="demo-pill">{t('demoMode')}</span>}
