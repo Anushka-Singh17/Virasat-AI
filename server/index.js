@@ -17,6 +17,11 @@ app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
+// Health check: bina DB query ke turant jawab (server zinda hai ya nahi dekhne ke liye)
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, time: Date.now() });
+});
+
 // Places ke routes (GET, POST, PUT /api/places)
 app.use("/api/places", require("./routes/places"));
 
