@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import exifr from 'exifr'
 import { analyzeImage } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
+import { SAMPLES, cachedResult } from '../samples'
+
+// Sample click par asli AI ko itna hi time dete hain, phir saved result dikhate hain
+const SAMPLE_TIMEOUT_MS = 8000
 
 const SOURCE_BADGE = {
   database: { key: 'sourceDatabase', cls: 'badge-db' },
@@ -22,6 +26,7 @@ function ResultCard({ data }) {
       <h4>{p.naam}</h4>
       {p.geminiInfo && <p>{p.geminiInfo}</p>}
       {p.translation && <p>{p.translation}</p>}
+      {data.cached && <p className="hint cached-note">{t('cachedDemo')}</p>}
       {data.source === 'unknown' && <p className="hint">{t('openPinHint')}</p>}
     </div>
   )
@@ -46,6 +51,7 @@ export default function UploadPanel({
   const [result, setResult] = useState(null)
   // Request chalte waqt dobara submit na ho (button disabled hone se pehle ka gap bhi band)
   const submittingRef = useRef(false)
+  const samplesRef = useRef(null)
 
   // Do alag file inputs: camera (seedha back camera) aur gallery
   const cameraRef = useRef(null)
@@ -142,11 +148,56 @@ export default function UploadPanel({
       // Pin tabhi banega jab jagah pata ho
       if (hasCoords(data.place)) onNewPlace(data.place)
     } catch {
-      setError(t('aiError'))
+      setError('busy') // dikhate waqt aiBusy message + "Try a sample" link banta hai
     } finally {
       submittingRef.current = false
       setLoading(false)
     }
+  }
+
+  // "Try a sample": photo load karo, asli AI try karo (8 s), na chale to saved result dikhao
+  async function handleSample(sample) {
+    if (submittingRef.current) return
+    submittingRef.current = true
+
+    setMode('place')
+    setLoading(true)
+    setError('')
+    setResult(null)
+    setCameraNoGps(false)
+    setChanging(false)
+    const where = { lat: sample.cached.lat, lng: sample.cached.lng }
+    try {
+      // Public folder ki photo ko File bana kar wahi flow chalate hain jo asli upload ka hai
+      let sampleFile = null
+      try {
+        const blob = await (await fetch(sample.image)).blob()
+        sampleFile = new File([blob], `${sample.id}.jpg`, { type: blob.type || 'image/jpeg' })
+        setFile(sampleFile)
+      } catch {
+        // photo na mile to bhi cached result dikha denge
+      }
+      onLocationFound(where)
+      setGpsNote(t('confirmedNote'))
+
+      let data
+      try {
+        if (!sampleFile) throw new Error('no file')
+        data = await analyzeImage({ file: sampleFile, mode: 'place', ...where, timeout: SAMPLE_TIMEOUT_MS })
+        if (!data?.place?.naam || data.source === 'unknown') throw new Error('no useful answer')
+        if (hasCoords(data.place)) onNewPlace(data.place)
+      } catch {
+        data = cachedResult(sample) // pin nahi banate: ye sirf demo hai
+      }
+      setResult(data)
+    } finally {
+      submittingRef.current = false
+      setLoading(false)
+    }
+  }
+
+  function scrollToSamples() {
+    samplesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   function handleUseCurrentLocation() {
@@ -296,7 +347,16 @@ export default function UploadPanel({
       </button>
 
       {loading && <p className="loading">{t('aiReading')}</p>}
-      {error && <p className="error">{error}</p>}
+      {error === 'busy' ? (
+        <p className="error">
+          {t('aiBusy')}{' '}
+          <button type="button" className="link-btn inline" onClick={scrollToSamples}>
+            {t('aiBusyLink')}
+          </button>
+        </p>
+      ) : (
+        error && <p className="error">{error}</p>
+      )}
       {result && <ResultCard data={result} />}
 
       {needsLocation && (
@@ -312,6 +372,26 @@ export default function UploadPanel({
           </div>
         </div>
       )}
+
+      {/* Demo safety net: 3 free photos, AI na chale tab bhi result dikhta hai */}
+      <div className="samples" ref={samplesRef}>
+        <h4>{t('trySample')}</h4>
+        <p className="hint">{t('sampleHint')}</p>
+        <div className="sample-grid">
+          {SAMPLES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className="sample-btn"
+              disabled={loading}
+              onClick={() => handleSample(s)}
+            >
+              <img src={s.image} alt={s.label} loading="lazy" />
+              <span>{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </section>
   )
 }

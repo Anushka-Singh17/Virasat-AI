@@ -94,7 +94,7 @@ export async function updatePlace(id, body) {
 }
 
 // file = photo/document, mode = "place" | "document", lat/lng = optional location
-export async function analyzeImage({ file, mode, lat, lng }) {
+export async function analyzeImage({ file, mode, lat, lng, timeout }) {
   if (isMock) return mockAnalyze({ mode, lat, lng })
 
   const form = new FormData()
@@ -104,7 +104,8 @@ export async function analyzeImage({ file, mode, lat, lng }) {
     form.append('lat', lat)
     form.append('lng', lng)
   }
-  const { data } = await http.post('/api/analyze', form)
+  // timeout (ms) optional: sample demo mein 8 second baad haar maan lete hain
+  const { data } = await http.post('/api/analyze', form, timeout ? { timeout } : undefined)
   return data
 }
 
