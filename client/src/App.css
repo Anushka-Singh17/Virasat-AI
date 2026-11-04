@@ -269,6 +269,81 @@
   transform: translateY(-1px);
 }
 
+/* "Server jaag raha hai" / error overlay: map ke upar, halka. Dikhna-chhupna opacity se, isliye fade smooth. */
+.server-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1100; /* Leaflet ke zoom buttons (z 1000) ke bhi upar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(251, 245, 234, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* chhupte waqt visibility fade khatam hone ke baad badalti hai */
+  transition:
+    opacity 0.45s ease,
+    visibility 0s linear 0.45s;
+}
+
+.server-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.45s ease,
+    visibility 0s;
+}
+
+.server-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 360px;
+  padding: 22px 26px;
+  border-radius: var(--radius-lg);
+  background: var(--glass);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  transform: translateY(10px);
+  transition: transform 0.45s ease;
+}
+
+.server-overlay.is-visible .server-card {
+  transform: none;
+}
+
+.server-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--brown);
+}
+
+.server-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--sand);
+  border-top-color: var(--terracotta);
+  border-radius: 50%;
+  animation: server-spin 0.9s linear infinite;
+}
+
+@keyframes server-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .server-spinner {
+    animation-duration: 3s;
+  }
+}
+
 /* Chhota legend: neeche-left kone mein */
 .map-key {
   position: absolute;

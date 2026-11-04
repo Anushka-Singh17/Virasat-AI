@@ -1,6 +1,24 @@
 // Har key ke liye 4 languages: en (English), hi (हिन्दी), bn (বাংলা), ta (தமிழ்)
 // Naya text add karna ho to yahan key add karo, aur component mein t('key') use karo.
 export const strings = {
+  serverWaking: {
+    en: '🏛️ Waking up the server... this can take up to a minute the first time.',
+    hi: '🏛️ सर्वर जाग रहा है... पहली बार में एक मिनट तक लग सकता है।',
+    bn: '🏛️ সার্ভার জেগে উঠছে... প্রথমবার এক মিনিট পর্যন্ত লাগতে পারে।',
+    ta: '🏛️ சர்வர் விழித்துக்கொண்டிருக்கிறது... முதல் முறை ஒரு நிமிடம் வரை ஆகலாம்.',
+  },
+  serverDown: {
+    en: "Server isn't responding right now. Please refresh in a minute.",
+    hi: 'सर्वर अभी जवाब नहीं दे रहा। कृपया एक मिनट बाद रिफ़्रेश करें।',
+    bn: 'সার্ভার এখন সাড়া দিচ্ছে না। অনুগ্রহ করে এক মিনিট পরে রিফ্রেশ করুন।',
+    ta: 'சர்வர் இப்போது பதிலளிக்கவில்லை. தயவுசெய்து ஒரு நிமிடம் கழித்து புதுப்பிக்கவும்.',
+  },
+  retryBtn: {
+    en: 'Retry',
+    hi: 'फिर कोशिश करें',
+    bn: 'আবার চেষ্টা করুন',
+    ta: 'மீண்டும் முயற்சி',
+  },
   trailsFeatured: {
     en: '⭐ Featured trails',
     hi: '⭐ खास ट्रेल्स',

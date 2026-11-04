@@ -36,6 +36,10 @@ export default function StatsBar({ total, verified, unknown, updatedAt }) {
     return () => clearInterval(timer)
   }, [])
 
+  // Stats abhi aaye nahi (server jaag raha hai / fail): number ki jagah "—" dikhao
+  const loaded = total != null && verified != null && unknown != null
+  const show = (value) => (loaded ? <CountUp value={value} /> : '—')
+
   const minutes = Math.max(0, Math.floor((now - updatedAt) / 60000))
   const updatedText = minutes < 1 ? t('updatedJustNow') : t('updatedMinAgo', { n: minutes })
 
@@ -46,34 +50,31 @@ export default function StatsBar({ total, verified, unknown, updatedAt }) {
           <span className="stat-icon" aria-hidden="true">
             📍
           </span>
-          <strong>
-            <CountUp value={total} />
-          </strong>
+          <strong>{show(total)}</strong>
           <span className="stat-label">{t('totalPlaces')}</span>
         </div>
         <div className="stat">
           <span className="stat-icon" aria-hidden="true">
             ✅
           </span>
-          <strong className="text-green">
-            <CountUp value={verified} />
-          </strong>
+          <strong className="text-green">{show(verified)}</strong>
           <span className="stat-label">{t('verified')}</span>
         </div>
         <div className="stat">
           <span className="stat-icon" aria-hidden="true">
             🟡
           </span>
-          <strong className="text-yellow">
-            <CountUp value={unknown} />
-          </strong>
+          <strong className="text-yellow">{show(unknown)}</strong>
           <span className="stat-label">{t('unknown')}</span>
         </div>
       </div>
-      <p className="stats-updated">
-        <span className="live-dot" />
-        {updatedText}
-      </p>
+      {/* Data aane se pehle "Updated just now" jhooth hoga, isliye tab chhupa do */}
+      {loaded && (
+        <p className="stats-updated">
+          <span className="live-dot" />
+          {updatedText}
+        </p>
+      )}
     </div>
   )
 }

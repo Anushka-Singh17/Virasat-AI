@@ -7,6 +7,8 @@ import PlaceDetail from './components/PlaceDetail'
 import UploadPanel from './components/UploadPanel'
 import AddPlaceModal from './components/AddPlaceModal'
 import TrailsPanel from './components/TrailsPanel'
+import ServerOverlay from './components/ServerOverlay'
+import { retryWithBackoff } from './retry'
 import { buildTrails } from './trails'
 import { getPlaces, getStats, isMock } from './api'
 import { useLanguage } from './i18n/LanguageContext'
@@ -39,6 +41,8 @@ export default function App() {
   const [places, setPlaces] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
+  const [slow, setSlow] = useState(false) // places 3 second se zyada le rahe hain
+  const [attempt, setAttempt] = useState(0) // Retry button ise badhata hai, to loading effect dobara chalta hai
 
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
@@ -70,7 +74,8 @@ export default function App() {
   }, [thanks])
 
   // Real mode mein stats backend se aate hain, aur kab update hue ye bhi yaad rakhte hain
-  const [serverStats, setServerStats] = useState({ total: 0, verified: 0, unknown: 0 })
+  // null = abhi aaye nahi (stats bar "—" dikhata hai)
+  const [serverStats, setServerStats] = useState(null)
   const [statsUpdatedAt, setStatsUpdatedAt] = useState(() => Date.now())
 
   // Map ka size (desktop: width %, mobile: height vh) aur fullscreen state
@@ -86,40 +91,56 @@ export default function App() {
     }
   }, [mapSize])
 
-  // App start hote hi places laao
+  // App start hote hi places laao. Server soya ho (free hosting) to ~60 second tak apne aap retry (2s, 4s, 8s, 16s...).
+  // 3 second se zyada lage to "server jaag raha hai" overlay dikhta hai.
   useEffect(() => {
-    let ignore = false
-    getPlaces()
+    let cancelled = false
+    const slowTimer = setTimeout(() => setSlow(true), 3000)
+
+    retryWithBackoff(getPlaces, { isCancelled: () => cancelled })
       .then((data) => {
-        if (!ignore) setPlaces(data)
+        if (!cancelled) setPlaces(data)
       })
       .catch(() => {
-        if (!ignore) setLoadError(true)
+        if (!cancelled) setLoadError(true)
       })
       .finally(() => {
-        if (!ignore) setLoading(false)
+        clearTimeout(slowTimer)
+        if (!cancelled) setLoading(false)
       })
-    return () => {
-      ignore = true
-    }
-  }, [])
 
-  // Real mode: start hote hi stats backend se lo
+    return () => {
+      cancelled = true
+      clearTimeout(slowTimer)
+    }
+  }, [attempt])
+
+  // Real mode: stats bhi isi tarah retry ke saath. Na aaye to stats bar mein "—" dikhta rahega (app nahi tootta).
   useEffect(() => {
     if (isMock) return
-    let ignore = false
-    getStats()
+    let cancelled = false
+
+    retryWithBackoff(getStats, { isCancelled: () => cancelled })
       .then((s) => {
-        if (!ignore) {
+        if (!cancelled) {
           setServerStats(s)
           setStatsUpdatedAt(Date.now())
         }
       })
       .catch(() => {})
+
     return () => {
-      ignore = true
+      cancelled = true
     }
-  }, [])
+  }, [attempt])
+
+  // Overlay ke "Retry" button se: sab dobara shuru
+  function retryLoad() {
+    setLoadError(false)
+    setLoading(true)
+    setSlow(true) // user pehle hi intezaar kar chuka hai, isliye seedha "jaag raha hai" message
+    setAttempt((n) => n + 1)
+  }
 
   // Search + type filter dono ek saath lagte hain
   const filtered = useMemo(() => {
@@ -309,7 +330,8 @@ export default function App() {
         style={{ '--map-width': `${mapSize.width}%`, '--map-height': `${mapSize.height}vh` }}
       >
         <main className={`map-area ${fullscreen ? 'fullscreen' : ''}`}>
-          {loading && <div className="map-overlay">{t('loadingMap')}</div>}
+          {loading && !slow && <div className="map-overlay">{t('loadingMap')}</div>}
+          <ServerOverlay waking={loading && slow} error={loadError} onRetry={retryLoad} />
           {!loading && !loadError && places.length === 0 && (
             <div className="map-overlay">{t('noPlacesYet')}</div>
           )}
@@ -378,14 +400,6 @@ export default function App() {
               onExit={exitTrail}
             />
 
-            {loadError && (
-              <div className="banner error-banner">
-                <p>{t('backendDown')}</p>
-                <button className="btn ghost small" onClick={() => window.location.reload()}>
-                  {t('tryAgain')}
-                </button>
-              </div>
-            )}
           </div>
 
           {selected && (

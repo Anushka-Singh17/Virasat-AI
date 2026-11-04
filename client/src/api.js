@@ -28,13 +28,14 @@ export async function getPlaces() {
     await wait(400)
     return mockStore.map((p) => ({ ...p }))
   }
-  const { data } = await http.get('/api/places')
+  // 15 second timeout: server so raha ho to atke rehne ke bajay fail ho, taaki retry chale
+  const { data } = await http.get('/api/places', { timeout: 15000 })
   return data
 }
 
 // Real mode only: backend se counts lo ({ total, verified, unknown })
 export async function getStats() {
-  const { data } = await http.get('/api/stats')
+  const { data } = await http.get('/api/stats', { timeout: 15000 })
   return data
 }
 
